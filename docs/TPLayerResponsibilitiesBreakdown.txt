@@ -1,0 +1,53 @@
+Layer Responsibilities:
+* UI:
+	- The UI communicates with the API Layer (REST in case of Web UI and Python in case of Desktop) retrieving the required data from lower application layers.
+	- The UI uses the retrieved data to populate the view for the user.
+	- The UI presents the user with an input object to fill which is then sent, through the API layer, to the lower layers for task execution.
+	
+	
+											"									"		"
+										"		"								"		"
+									"				"							"		"
+								"						"						"		"
+										"		"								"		"
+										"		"						"						"
+										"		"							"				"
+										"		"								"		"
+										"		"									"
+*API Layer:
+	- REST: retrieves the required data to populate the UI forms from the Business Layer.
+	- REST: passes user input from the Web UI forms to the lower layers for task execution.
+	- Python: retrieves the required data for the CLI to function from the Business Layer.
+	- Python: passes user input from the CLI to the lower layers for task execution.
+	
+	
+	
+											"									"		"
+										"		"								"		"
+									"				"							"		"
+								"						"						"		"
+										"		"								"		"
+										"		"						"						"
+										"		"							"				"
+										"		"								"		"
+										"		"									"																"		"
+*Business Layer (Core):
+	- Responds to API Layer requests and propagate the data required upwards after receiving it from the DA Layer.
+	- Responds to user inputs from the API layers and maps them to the correct objects in the Business layers.
+	- Starts a subprocess and executes the selected input task/task queue. (We can start with a simple of tasking of making the POC we did work through here).
+	- Writing the output runtime data stream to the agreed upon class and returns it upwards.
+
+																												"									"		"
+										"		"								"		"
+									"				"							"		"
+								"						"						"		"
+										"		"								"		"
+										"		"						"						"
+										"		"							"				"
+										"		"								"		"
+										"		"									"
+
+* Data Access Layer (DA):
+	- Responsible for reading the tasks from the configured JSON objects.
+	- Responsible for mapping the tasks from JSON to a corresponding Data Access Object (DAO).
+	- Responsible for populating the list of entities we have and sending them to the necessary layers.
