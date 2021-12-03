@@ -37,7 +37,7 @@ Layer Responsibilities:
 	- Starts a subprocess and executes the selected input task/task queue. (We can start with a simple of tasking of making the POC we did work through here).
 	- Writing the output runtime data stream to the agreed upon class and returns it upwards.
 
-																												"									"		"
+											"									"		"
 										"		"								"		"
 									"				"							"		"
 								"						"						"		"
@@ -45,7 +45,7 @@ Layer Responsibilities:
 										"		"						"						"
 										"		"							"				"
 										"		"								"		"
-										"		"									"
+										"		"									"		
 
 * Data Access Layer (DA):
 	- Responsible for reading the tasks from the configured JSON objects.
