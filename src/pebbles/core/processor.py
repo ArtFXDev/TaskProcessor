@@ -1,12 +1,12 @@
 
 class Processor(object):
 
-    def __init__(self, queues):
-        self.task_queues = queues
+    def __init__(self, job):
+        self.job = job
         pass
 
-    #Overrides the call operator [ () ] and process the given tasks
+    # Overrides the call operator [ () ] and process the given tasks
     def __call__(self, *args, **kwargs):
-        for queue in self.task_queues:
-            queue.start()
+        # TODO: Add job execution.
+        self.job.start()
         pass
