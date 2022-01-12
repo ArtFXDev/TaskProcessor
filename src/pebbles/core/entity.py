@@ -1,4 +1,4 @@
-import pebbles.utils.path_utils as path_utils
+import src.pebbles.utils.path_utils as path_utils
 
 
 class Entity(object):
@@ -7,6 +7,6 @@ class Entity(object):
         ##TODO: Replace the path by processor data type.
         self.path = path
         self.id = "Entity" + str(id(self))
-        self.label = path_utils.get_label(path)
+        self.label = path_utils.get_name_from_path(path)
         print("Init entity: {} \nIn path: {} \nid: {}".format(self.label, self.path, self.id))
         pass

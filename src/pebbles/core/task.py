@@ -13,7 +13,7 @@ class Task(object):
         self.actions.append(action)
         pass
 
-    def add_actions(self,actions):
+    def add_actions(self, actions):
         for action in actions:
             self.actions.append(action)
 

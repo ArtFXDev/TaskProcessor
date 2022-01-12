@@ -1,0 +1,26 @@
+{
+  "label": "Other Task",
+  "inputs": [
+    {
+      "label": "Dummy Integer Input",
+      "type": "Integer",
+      "value": 2
+    },
+    {
+      "label": "Dummy Float Input",
+      "type": "Float",
+      "value": 2.893
+    }
+  ],
+  "outputs": [
+    {
+      "label": "Dummy Output",
+      "type": "Path",
+      "value": "D:/Personal_Work/Pipeline/test.abc"
+    }
+  ],
+  "supported_engines": [
+    "houdini"
+  ],
+  "exec_path": "other_task.py"
+}
