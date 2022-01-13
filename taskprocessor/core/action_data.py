@@ -1,6 +1,6 @@
 from enum import Enum
-import src.pebbles.utils.path_utils as path_utils
-import src.pebbles.utils.json_utils as json_utils
+import taskprocessor.utils.path_utils as path_utils
+import taskprocessor.utils.json_utils as json_utils
 
 
 class ActionDataType(Enum):

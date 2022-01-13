@@ -1,5 +1,5 @@
-import src.pebbles.core as core
-import src.pebbles.utils.path_utils as path_utils
+import taskprocessor.core as core
+import taskprocessor.utils.path_utils as path_utils
 
 
 class ActionManager(object):

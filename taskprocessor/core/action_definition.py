@@ -1,6 +1,6 @@
-import src.pebbles.core as core
-import src.pebbles.utils.path_utils as path_utils
-import src.pebbles.utils.json_utils as json_utils
+import taskprocessor.core as core
+import taskprocessor.utils.path_utils as path_utils
+import taskprocessor.utils.json_utils as json_utils
 
 
 class ActionDefinition(object):
@@ -60,7 +60,7 @@ class ActionDefinition(object):
 
 
 if __name__ == "__main__":
-    data = path_utils.read_file('D:/Personal_Work/Pipeline/TaskProcessor/TaskProcessor/src/pebbles/resources/my_example_task.json')
+    data = path_utils.read_file('D:/Personal_Work/Pipeline/TaskProcessor/TaskProcessor/src/taskprocessor/resources/my_example_task.json')
     action = ActionDefinition.from_json(data)
     print("Action Object: {0}".format(action.__dict__))
     print("Action JSON: {0}".format(action.to_json()))

@@ -1,5 +1,5 @@
 import unittest
-import pebbles.core as core
+import taskprocessor.core as core
 
 
 class MyTestCase(unittest.TestCase):
@@ -37,7 +37,7 @@ class MyTestCase(unittest.TestCase):
     def test_action_manager(self):
         print("<----RUNNING ACTION MANAGER TEST---->")
 
-        action_paths = ["./pebbles/resources",
+        action_paths = ["./taskprocessor/resources",
                         "C:/Users/suraj/Documents/taskprocessor"]
 
         am = core.ActionManager(action_paths)

@@ -1,4 +1,4 @@
-import src.pebbles.utils.path_utils as path_utils
+import taskprocessor.utils.path_utils as path_utils
 
 
 class Entity(object):
