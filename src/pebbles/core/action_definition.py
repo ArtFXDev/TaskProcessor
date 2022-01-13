@@ -34,6 +34,7 @@ class ActionDefinition(object):
     # Get a ActionDefinition object from json string
     @staticmethod
     def from_json(json_data):
+        # TODO: Throw exceptions on fail
         json_dict = json_utils.json_to_dict(json_data)
 
         action = ActionDefinition(json_dict['label'],
