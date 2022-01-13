@@ -1,5 +1,5 @@
 import unittest
-import pebbles.core as core
+import taskprocessor.core as core
 
 
 class MyTestCase(unittest.TestCase):
@@ -37,7 +37,7 @@ class MyTestCase(unittest.TestCase):
     def test_action_manager(self):
         print("<----RUNNING ACTION MANAGER TEST---->")
 
-        action_paths = ["./pebbles/resources",
+        action_paths = ["./taskprocessor/resources",
                         "C:/Users/suraj/Documents/taskprocessor"]
 
         am = core.ActionManager(action_paths)
@@ -51,6 +51,37 @@ class MyTestCase(unittest.TestCase):
             print(a.action_definition.name)
 
         print("<----COMPLETED ACTION MANAGER TEST---->")
+
+    def test_task_execution(self):
+        print("<----RUNNING TASK EXECUTION TEST---->")
+
+        # Initialize Action manager
+        action_paths = ["../taskprocessor/resources"]
+        am = core.ActionManager(action_paths)
+
+        # Get three actions (Similar to adding three nodes in the UI)
+        action_random_name_gen = am.get_actions_by_name("random_name_gen")[0]
+        action_create_file = am.get_actions_by_name("create_file")[0]
+        action_write_file = am.get_actions_by_name("write_file")[0]
+
+        # Change inputs
+        # Set random name generation length
+        action_random_name_gen.set_input(0, 12)
+        action_create_file.set_input(0, '"D:/Personal_Work/Pipeline/TaskProcessor/TaskProcessor/taskprocessor/resources/gen_file.txt"')
+
+        # Link filepath input of this node with output of create file node
+        action_write_file.link_input(0, None, action_create_file.action_definition.outputs[0].id)
+        # Link filepath input of this node with output of create file node
+        action_write_file.link_input(1, None, action_random_name_gen.action_definition.outputs[0].id)
+
+        # Add actions to task
+        actions = [action_random_name_gen, action_create_file, action_write_file]
+        task = core.Task(None)
+        task.add_actions(actions)
+        task.start()
+
+        print("<----COMPLETED TASK EXECUTION TEST---->")
+
 
 
 if __name__ == '__main__':

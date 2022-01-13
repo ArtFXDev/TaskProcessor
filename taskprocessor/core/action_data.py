@@ -1,6 +1,6 @@
 from enum import Enum
-import src.pebbles.utils.path_utils as path_utils
-import src.pebbles.utils.json_utils as json_utils
+import taskprocessor.utils.path_utils as path_utils
+import taskprocessor.utils.json_utils as json_utils
 
 
 class ActionDataType(Enum):
@@ -13,6 +13,7 @@ class ActionDataType(Enum):
 
 
 class ActionData(object):
+    current_count = 0
 
     def __init__(self,
                  label,
@@ -20,9 +21,11 @@ class ActionData(object):
                  value=None):
         self.label = label
         self.name = path_utils.get_name_from_label(self.label)
-        self.id = self.name + "_" + str(id(self))
+        self.id = self.name + "_" + str(ActionData.current_count)
         self.type = data_type
         self.value = value
+
+        ActionData.current_count += 1
 
     # Covert current ActionData object from dict to string
     def __str__(self):

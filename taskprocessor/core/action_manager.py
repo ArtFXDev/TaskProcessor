@@ -1,5 +1,5 @@
-import src.pebbles.core as core
-import src.pebbles.utils.path_utils as path_utils
+import taskprocessor.core as core
+import taskprocessor.utils.path_utils as path_utils
 
 
 class ActionManager(object):
@@ -22,10 +22,16 @@ class ActionManager(object):
             json_data = path_utils.read_file(j)
             action = core.ActionDefinition.from_json(json_data)
             self.action_definitions.append(action)
-            self.action_runtimes.append(core.ActionRuntime(action))
+            self.action_runtimes.append(core.ActionRuntime(action, j))
 
     def get_actions_by_name(self, name):
         return [a for a in self.action_runtimes if name in a.action_definition.name]
+
+    def get_actions_by_names(self, names):
+        actions = []
+        for n in names:
+            actions.extend(self.get_actions_by_name(n))
+        return actions
 
     def get_actions_by_engine(self, engine):
         return [a for a in self.action_runtimes if engine in a.action_definition.supported_engines]

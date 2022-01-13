@@ -1,21 +1,23 @@
-import src.pebbles.core as core
-import src.pebbles.utils.path_utils as path_utils
-import src.pebbles.utils.json_utils as json_utils
+import taskprocessor.core as core
+import taskprocessor.utils.path_utils as path_utils
+import taskprocessor.utils.json_utils as json_utils
 
 
 class ActionDefinition(object):
+    current_count = 0
 
     def __init__(self, label, exec_path, inputs=None, outputs=None, supported_engines=None):
         self.label = label
 
         self.name = path_utils.get_name_from_label(self.label)
-        self.id = self.name + "_" + str(id(self))
-
+        self.id = self.name + "_" + str(ActionDefinition.current_count)
 
         self.exec_path = exec_path
         self.inputs = inputs
         self.outputs = outputs
         self.supported_engines = supported_engines
+
+        ActionDefinition.current_count += 1
 
     # Covert current ActionDefinition object from dict to string
     def __str__(self):
@@ -61,7 +63,7 @@ class ActionDefinition(object):
 
 
 if __name__ == "__main__":
-    data = path_utils.read_file('D:/Personal_Work/Pipeline/TaskProcessor/TaskProcessor/src/pebbles/resources/my_example_task.json')
+    data = path_utils.read_file('/taskprocessor/resources/my_example_task.json')
     action = ActionDefinition.from_json(data)
     print("Action Object: {0}".format(action.__dict__))
     print("Action JSON: {0}".format(action.to_json()))
