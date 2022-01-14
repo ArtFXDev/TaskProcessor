@@ -1,23 +1,30 @@
+from __future__ import annotations
+
 import taskprocessor.core as core
 import taskprocessor.utils.path_utils as path_utils
 import taskprocessor.utils.json_utils as json_utils
 
 
 class ActionDefinition(object):
-    current_count = 0
+    # current_count = 0
 
-    def __init__(self, label, exec_path, inputs=None, outputs=None, supported_engines=None):
+    def __init__(self,
+                 label: str,
+                 exec_path: str,
+                 inputs: [core.ActionData] = None,
+                 outputs: [core.ActionData] = None,
+                 supported_engines: [str] = None):
         self.label = label
 
         self.name = path_utils.get_name_from_label(self.label)
-        self.id = self.name + "_" + str(ActionDefinition.current_count)
+        # self.id = self.name + "_" + str(ActionDefinition.current_count)
 
         self.exec_path = exec_path
         self.inputs = inputs
         self.outputs = outputs
         self.supported_engines = supported_engines
 
-        ActionDefinition.current_count += 1
+        # ActionDefinition.current_count += 1
 
     # Covert current ActionDefinition object from dict to string
     def __str__(self):
@@ -26,16 +33,16 @@ class ActionDefinition(object):
         def_data['inputs'] = [json_utils.json_to_dict(i.to_json()) for i in self.inputs]
         # For each output, convert it from string to a dictionary
         def_data['outputs'] = [json_utils.json_to_dict(o.to_json()) for o in self.outputs]
-        # Return the string represtation of dict of current object
+        # Return the string representation of dict of current object
         return json_utils.dict_to_json(def_data)
 
     # Get json string from current ActionDefinition object
-    def to_json(self):
+    def to_json(self) -> str:
         return self.__str__()
 
     # Get a ActionDefinition object from json string
     @staticmethod
-    def from_json(json_data):
+    def from_json(json_data) -> ActionDefinition:
         # TODO: Throw exceptions on fail
         json_dict = json_utils.json_to_dict(json_data)
 

@@ -42,13 +42,13 @@ class MyTestCase(unittest.TestCase):
 
         am = core.ActionManager(action_paths)
         print("All Actions:")
-        for a in am.action_runtimes:
-            print(a.action_definition.name)
+        for a in am.actions:
+            print(a.definition.name)
 
         search_criteria = "example"
         print("Actions containing name: {0}:".format(search_criteria))
         for a in am.get_actions_by_name(search_criteria):
-            print(a.action_definition.name)
+            print(a.definition.name)
 
         print("<----COMPLETED ACTION MANAGER TEST---->")
 
@@ -59,29 +59,31 @@ class MyTestCase(unittest.TestCase):
         action_paths = ["../taskprocessor/resources"]
         am = core.ActionManager(action_paths)
 
-        # Get three actions (Similar to adding three nodes in the UI)
-        action_random_name_gen = am.get_actions_by_name("random_name_gen")[0]
-        action_create_file = am.get_actions_by_name("create_file")[0]
-        action_write_file = am.get_actions_by_name("write_file")[0]
+        # Create three action runtimes (Similar to adding three nodes in the UI)
+        action_random_name_gen = am.create_action("random_name_generator")
+        action_create_file = am.create_action("create_file")
+        action_write_file = am.create_action("write_file")
+
 
         # Change inputs
         # Set random name generation length
-        action_random_name_gen.set_input(0, 12)
-        action_create_file.set_input(0, '"D:/Personal_Work/Pipeline/TaskProcessor/TaskProcessor/taskprocessor/resources/gen_file.txt"')
+        am.set_input(action_random_name_gen.id, 0, 12)
+        # Set filepath
+        am.set_input(action_create_file.id,
+                     0,
+                     '"D:/Personal_Work/Pipeline/TaskProcessor/TaskProcessor/taskprocessor/resources/gen_file.txt"')
 
         # Link filepath input of this node with output of create file node
-        action_write_file.link_input(0, None, action_create_file.action_definition.outputs[0].id)
+        am.link_input(action_write_file.id, 0, action_create_file.id, 0)
         # Link filepath input of this node with output of create file node
-        action_write_file.link_input(1, None, action_random_name_gen.action_definition.outputs[0].id)
+        am.link_input(action_write_file.id, 1, action_random_name_gen.id, 0)
 
         # Add actions to task
-        actions = [action_random_name_gen, action_create_file, action_write_file]
         task = core.Task(None)
-        task.add_actions(actions)
+        task.add_actions(am.actions)
         task.start()
 
         print("<----COMPLETED TASK EXECUTION TEST---->")
-
 
 
 if __name__ == '__main__':
