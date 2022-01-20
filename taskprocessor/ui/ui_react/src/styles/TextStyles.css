@@ -1,0 +1,11 @@
+.HeadersLight{
+    text-align: center;
+    color: floralwhite;
+    text-shadow: 2px 2px rgba(233, 228, 216, 0.479);
+}
+
+.HeadersDark{
+    text-align: center;
+    color: dimgray;
+    text-shadow: 2px 2px rgba(233, 228, 216, 0.479);
+}
