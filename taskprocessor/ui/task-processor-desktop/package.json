@@ -1,0 +1,18 @@
+{
+  "name": "task-processor-desktop",
+  "version": "1.0.0",
+  "description": "Task Processor desktop application",
+  "main": "main.js",
+  "author": "TD4",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArtFXDev/TaskProcessor.git"
+  },
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "react-flow-renderer": "^9.7.3"
+  }
+}
