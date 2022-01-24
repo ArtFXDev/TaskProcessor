@@ -2,7 +2,7 @@
 import React, { Component } from "react";
 import Canvas from "./components/Canvas";
 import Entities from "./components/Entities";
-//import Properties from "./components/Properties";
+import Properties from "./components/Properties";
 
 // Styles
 import './styles/PageStyles.css'
@@ -19,6 +19,9 @@ class App extends Component{
           </div>
           <div className='NodeCanvas'> 
             <Canvas />
+          </div>
+          <div className='NodeProperties'>
+            <Properties />
           </div>
         </div>
       </>

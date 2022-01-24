@@ -1,5 +1,4 @@
 import React from 'react'
-import Properties from './Properties'
 import ReactFlow, {
        Background, 
        MiniMap, 
@@ -11,10 +10,12 @@ import '../styles/PageStyles.css'
 import '../styles/TextStyles.css'
 
 const onElementClick = (event, element) => {
-  console.log('click', element);
-  <div className='NodeProperties'>
-    <Properties />
-  </div>
+  console.log('Node ', element.id, ' ID');
+  console.log('Node Data: ', element.data);
+}
+
+const getSelectedNode = () => {
+  onElementClick={onElementClick};
 }
 
 //Links
@@ -51,20 +52,30 @@ const elements = [
   {
     id: '1',
     type: 'input', // input node
-    data: { label: 'Input Node' },
+    data: { label: 'Input Node',
+            input: 'Entity Input',
+            output: 'Downstream'
+          },
     position: { x: 250, y: 125 },
   },
   // default node
   {
     id: '2',
     // you can also pass a React component as a label
-    data: { label: <div>Default Node</div> },
+    data: { label: 'Default Node',
+            input: 'Node 1',
+            output: 'So many calculations wow'
+          },
     position: { x: 250, y: 250 },
   },
+
   {
     id: '3',
     type: 'output', // output node
-    data: { label: 'Output Node' },
+    data: { label: 'Output Node', 
+            Input: 'Node 2',
+            Output: 'File'
+          },
     position: { x: 250, y: 375 },
   },
   // animated edge
