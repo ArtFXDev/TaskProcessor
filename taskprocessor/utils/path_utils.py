@@ -19,6 +19,16 @@ def get_extension(path):
     return Path(path).suffix
 
 
+def get_absolute_path(relative_path, cwd=None):
+    if cwd is None:
+        return Path(relative_path).absolute()
+    else:
+        if Path(cwd).is_file():
+            return Path(cwd).parent / relative_path
+        else:
+            return Path(cwd) / relative_path
+
+
 def list_files(path, recursive=True, extensions=None):
     # clean base path
     if str(path).endswith('/') or str(path).endswith('\\'):
