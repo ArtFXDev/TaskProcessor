@@ -9,9 +9,8 @@ class Task(object):
         self.label = ""
         self.actions = []
         self.entity = entity
-        pass
 
-    def __get_final_code(self):
+    def get_code(self):
         final_code = ""
         for action in self.actions:
             final_code += "\n" + action.get_exec_code()
@@ -32,7 +31,7 @@ class Task(object):
     def start(self):
         # TODO: Implement proper task execution
         print("\n\t<----- EXECUTING ACTIONS ----->\n")
-        final_code = self.__get_final_code()
+        final_code = self.get_code()
         print("\n\nFinal Code: \n {}".format(final_code))
         print("\n\t\t<----- OUTPUT FROM EXEC CODE ----->")
         exec(final_code)

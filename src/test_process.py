@@ -1,5 +1,6 @@
 import unittest
 import taskprocessor.core as core
+import taskprocessor.core.engine as engine
 
 
 class MyTestCase(unittest.TestCase):
@@ -56,14 +57,13 @@ class MyTestCase(unittest.TestCase):
         print("<----RUNNING TASK EXECUTION TEST---->")
 
         # Initialize Action manager
-        action_paths = ["../taskprocessor/resources"]
+        action_paths = ["../taskprocessor/resources/actions"]
         am = core.ActionManager(action_paths)
 
         # Create three action runtimes (Similar to adding three nodes in the UI)
         action_random_name_gen = am.create_action("random_name_generator")
         action_create_file = am.create_action("create_file")
         action_write_file = am.create_action("write_file")
-
 
         # Change inputs
         # Set random name generation length
@@ -83,7 +83,19 @@ class MyTestCase(unittest.TestCase):
         task.add_actions(am.actions)
         task.start()
 
+
+
         print("<----COMPLETED TASK EXECUTION TEST---->")
+
+    def test_engine(self):
+        print("<----RUNNING ENGINE TEST---->")
+
+        engine_config_path = "../taskprocessor/resources/configs/config_engine.json"
+        eg = engine.Engine(engine_config_path)
+        for e in eg.engine_data:
+            print(e)
+
+        print("<----COMPLETED ENGINE TEST---->")
 
 
 if __name__ == '__main__':
