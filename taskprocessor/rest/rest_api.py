@@ -15,19 +15,27 @@ class ActionInput:
 @app.route('/api/actions', methods=['GET', 'POST'])
 def api_actions():
     if request.method == "GET":
-        return make_response(rest_handler.get_actions(), 200)
+        result = rest_handler.get_actions()
+        if result is None:
+            return make_response("No actions were found", 404)
+        else:
+            return make_response(result, 200)
     elif request.method == "POST":
-        print("In the POST function")
         content = request.json
         action_input = ActionInput(label=content['label'], name=content['name'],
                                    action_type=content['type'], path=content['path'])
-        return make_response(rest_handler.submit_action(action_input), 200)
+        result = rest_handler.submit_action(action_input)
+        return make_response(result, 200)
     return None
 
 
 @app.route('/api/actions/<action_name>', methods=['GET'])
 def get_action(action_name):
-    return make_response(rest_handler.get_single_action(action_name), 200)
+    result = rest_handler.get_single_action(action_name)
+    if result is None:
+        return make_response("No corresponding action to the name entered was found", 404)
+    else:
+        return make_response(result, 200)
 
 
 @app.route('/api/entities', methods=['GET'])

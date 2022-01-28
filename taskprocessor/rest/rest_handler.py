@@ -11,18 +11,21 @@ def get_actions():
         json_str = value.to_json()
         response.append(json_str)
     response_str = "[" + ','.join(str(x) for x in response) + "]"
-    return response_str
+    if response_str != "":
+        return response_str
+    else:
+        return None
 
 
 def get_single_action(action_name):
     action_paths = ["../resources/"]
     am = core.ActionManager(action_paths)
     for key, value in am.action_definitions.items():
-        new_label = value.label.lower()
-        new_label = new_label.replace(" ", "")
-        if new_label == action_name:
+        new_name = value.name.lower()
+        new_name = new_name.replace(" ", "")
+        if new_name == action_name:
             return value.to_json()
-    return "No action corresponding to the action name exists"
+    return None
 
 
 def submit_action(action_input):
