@@ -15,7 +15,7 @@
     }
   ],
   "supported_engines": [
-    "maya"
+    "python"
   ],
   "exec_path": "create_file.py"
 }

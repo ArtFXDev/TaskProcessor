@@ -14,7 +14,7 @@
   ],
   "outputs": [],
   "supported_engines": [
-    "maya"
+    "python"
   ],
   "exec_path": "write_file.py"
 }

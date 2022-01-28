@@ -6,12 +6,12 @@ import taskprocessor.utils.path_utils as path_utils
 
 class ActionManager(object):
     # A dictionary with action definition path as key and ActionDefinition as value
-    action_definitions = {}
-    __filtered_actions = {}
+    action_definitions: dict[str, core.ActionDefinition] = {"dummy/path": core.ActionDefinition()}
+    __filtered_actions: dict[str, core.ActionDefinition] = {"dummy/path": core.ActionDefinition()}
 
-    def __init__(self, action_paths: [str]):
-        self.action_paths = action_paths
-        self.actions: [core.ActionRuntime] = []
+    def __init__(self, action_paths: list[str]):
+        self.action_paths: list[str] = action_paths
+        self.actions: [core.ActionRuntime] = [core.ActionRuntime()]
         self.__init_action_definitions()
 
     def __init_action_definitions(self):
@@ -34,6 +34,10 @@ class ActionManager(object):
             if engine_name.lower() in action_def.supported_engines:
                 ActionManager.__filtered_actions[path] = action_def
 
+    def get_action_definition_by_name(self, name: str) -> core.ActionDefinition:
+        return next((ad for (p, ad) in ActionManager.action_definitions.items() if name.lower() in ad.label.lower()),
+                    None)
+
     def get_all_action_definitions(self) -> [core.ActionDefinition]:
         definitions = []
         for (path, action_def) in ActionManager.action_definitions.items():
@@ -47,7 +51,9 @@ class ActionManager(object):
                 definitions.append(action_def)
         return definitions
 
-    def create_action(self, action_name: str) -> core.ActionRuntime:
+    def create_action(self, action_name: str) -> core.ActionRuntime | None:
+        if len(self.actions) == 1 and self.actions[0].definition is None:
+            self.actions.clear()
 
         action_path_def_pair = next(
             ((p, a) for (p, a) in ActionManager.__filtered_actions.items() if action_name == a.name),

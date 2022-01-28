@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-import  taskprocessor.core as core
+import taskprocessor.core as core
 import taskprocessor.core.engine as eg
+
 
 class Processor(object):
 
     def __init__(self, engine: eg.Engine):
-        self.engine = engine
-        self.current_job: [core.Job] = None
+        self.engine: eg.Engine = engine
+        self.current_job: core.Job | None = None
 
     def create_job(self, entities, actions):
         tasks = []
@@ -15,19 +16,13 @@ class Processor(object):
             task = core.Task(e)
             task.add_actions(actions)
             tasks.append(task)
-        self.current_job = core.Job(tasks)
+        self.current_job = core.Job(self.engine, tasks)
 
     def start(self):
-        pass
+        self.current_job.start()
 
     def pause(self):
         pass
 
     def stop(self):
-        pass
-
-    # Overrides the call operator [ () ] and process the given tasks
-    def __call__(self, *args, **kwargs):
-        # TODO: Add job execution.
-        self.job.start()
         pass

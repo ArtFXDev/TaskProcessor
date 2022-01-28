@@ -4,37 +4,6 @@ import taskprocessor.core.engine as engine
 
 
 class MyTestCase(unittest.TestCase):
-    def test_processor(self):
-        print("<----RUNNING TASK PROCESSOR TEST---->")
-
-        # Create an entity with hard coded path.
-        entity1 = core.Entity(
-            "C:/Users/User/Desktop/SchoolFiles/Pipeline/MOVIE/ASSETS/CAR/MODELING/PUBLISHED/CAR_MODELING_V001.mb")
-        entity2 = core.Entity(
-            "C:/Users/User/Desktop/SchoolFiles/Pipeline/MOVIE/ASSETS/CAR/SURFACING/WIP/CAR_SURFACING_V002.ma")
-
-        task1 = core.Task(entity1)
-        task2 = core.Task(entity2)
-
-        action_definition1 = core.ActionDefinition()
-        action_definition1.label = "Test1Label"
-        action_definition1.name = "Test1Name"
-        action_definition1.exe_code = "Test1Exe"
-
-        action_runtime1 = core.ActionRuntime(action_definition1)
-        action_runtime2 = core.ActionRuntime(action_definition1)
-
-        task1.add_actions([action_runtime1, action_runtime2])
-        task2.add_actions([action_runtime1, action_runtime2])
-
-        job = core.Job([task1, task2])
-
-        processor = core.Processor(job)
-
-        processor()
-
-        print("<----COMPLETED TASK PROCESSOR TEST---->")
-
     def test_action_manager(self):
         print("<----RUNNING ACTION MANAGER TEST---->")
 
@@ -56,14 +25,51 @@ class MyTestCase(unittest.TestCase):
     def test_task_execution(self):
         print("<----RUNNING TASK EXECUTION TEST---->")
 
+        # Initialize Engine
+        engine_config_path = "../resources/configs/config_engine.json"
+        eg = engine.Engine(engine_config_path)
+
+        # Set current engine
+        is_engine_set = eg.set_current_engine("python")
+        if is_engine_set:
+            print("Engine set to: {}".format(eg.current_engine.name))
+        else:
+            print("Engine not found")
+            return False
+        print("\n")
+
+        # Initialize Entities
+        em = core.EntityManager()
+        em.extensions = eg.current_engine.extensions
+        em.add_entity('../resources/example_entities')
+
+        if len(em.entities) == 0:
+            print("No entities found")
+            return False
+
+        print("Listing entities:")
+        for e in em.entities:
+            print(e.path)
+        print("\n")
+
         # Initialize Action manager
-        action_paths = ["../taskprocessor/resources/actions"]
+        action_paths = ["../actions"]
         am = core.ActionManager(action_paths)
+        am.set_current_engine(eg.current_engine.name)
 
         # Create three action runtimes (Similar to adding three nodes in the UI)
         action_random_name_gen = am.create_action("random_name_generator")
+        if action_random_name_gen is None:
+            print("Failed to create node: random_name_generator")
+            return False
         action_create_file = am.create_action("create_file")
+        if action_create_file is None:
+            print("Failed to create node: create_file")
+            return False
         action_write_file = am.create_action("write_file")
+        if action_write_file is None:
+            print("Failed to create node: write_file")
+            return False
 
         # Change inputs
         # Set random name generation length
@@ -71,26 +77,25 @@ class MyTestCase(unittest.TestCase):
         # Set filepath
         am.set_input(action_create_file.id,
                      0,
-                     '"D:/Personal_Work/Pipeline/TaskProcessor/TaskProcessor/taskprocessor/resources/gen_file.txt"')
+                     '"D:/Personal_Work/Pipeline/TaskProcessor/TaskProcessor/build/gen_file.txt"')
 
         # Link filepath input of this node with output of create file node
         am.link_input(action_write_file.id, 0, action_create_file.id, 0)
         # Link filepath input of this node with output of create file node
         am.link_input(action_write_file.id, 1, action_random_name_gen.id, 0)
 
-        # Add actions to task
-        task = core.Task(None)
-        task.add_actions(am.actions)
-        task.start()
-
-
+        print('\n')
+        proc = core.Processor(eg)
+        proc.create_job(em.entities, am.actions)
+        proc.start()
+        print('\n')
 
         print("<----COMPLETED TASK EXECUTION TEST---->")
 
     def test_engine(self):
         print("<----RUNNING ENGINE TEST---->")
 
-        engine_config_path = "../taskprocessor/resources/configs/config_engine.json"
+        engine_config_path = "../resources/configs/config_engine.json"
         eg = engine.Engine(engine_config_path)
         for e in eg.engine_data:
             print(e)

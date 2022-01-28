@@ -5,10 +5,10 @@ import taskprocessor.utils.json_utils as json_utils
 
 class EngineData(object):
 
-    def __init__(self, name: str, extensions: [str], exec_path: str):
-        self.name = name
-        self.extensions = extensions
-        self.exec_path = exec_path
+    def __init__(self, name: str = "python", extensions: list[str] = None, exec_path: str = "python.exe"):
+        self.name: str = name
+        self.extensions: list[str] = extensions
+        self.exec_path: str = exec_path
 
     # Covert current ActionData object from dict to string
     def __str__(self):
