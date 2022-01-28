@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any
 import six
 
 if six.PY2:
@@ -13,18 +14,21 @@ import taskprocessor.utils.path_utils as path_utils
 class ActionRuntime(object):
     # A dictionary with the action name as key and a counter as value.
     # The counter is used to generate ID.
-    __id_dict = {}
+    __id_dict: dict[str, int] = {"dummy": 0}
 
-    def __init__(self, definition_path: str, definition: core.ActionDefinition):
-        self.definition_path = definition_path
-        self.definition = definition
+    def __init__(self, definition_path: str = "dummy/path", definition: core.ActionDefinition = None):
+        self.definition_path: str = definition_path
+        self.definition: core.ActionDefinition = definition
 
-        self.id = ""
-        self.__gen_id()
+        self.id: str = ""
+        if self.definition_path != "dummy/path" and self.definition is not None:
+            self.__gen_id()
 
-        self.linked_io = {}
-        self.exec_code = ""
-        self.__init_exec_code()
+        self.linked_io: dict[str, Any] = {}
+        self.exec_code: str = ""
+
+        if self.definition_path != "dummy/path" and self.definition is not None:
+            self.__init_exec_code()
 
     # Generates ID for each ActionRuntime instance.
     # ID will be have the form <action_name>_<count>
@@ -41,7 +45,7 @@ class ActionRuntime(object):
     def get_input_output_id(self, input_output_name) -> str:
         return self.id + "_" + input_output_name
 
-    # Initializes executable code by substituting variable names
+    # Initializes executable code by substituting variable names.
     # Variable names will have the form <action_runtime_id>_<input/output_name>
     def __init_exec_code(self):
         exec_file_path = path_utils.get_absolute_path(self.definition.exec_path, self.definition_path)

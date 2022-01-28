@@ -1,17 +1,17 @@
 from __future__ import annotations
 
-
 import taskprocessor.core as core
 import taskprocessor.utils.path_utils as path_utils
 
 
 class ActionManager(object):
     # A dictionary with action definition path as key and ActionDefinition as value
-    action_definitions = {}
+    action_definitions: dict[str, core.ActionDefinition] = {"dummy/path": core.ActionDefinition()}
+    __filtered_actions: dict[str, core.ActionDefinition] = {"dummy/path": core.ActionDefinition()}
 
-    def __init__(self, action_paths: [str]):
-        self.action_paths = action_paths
-        self.actions = []
+    def __init__(self, action_paths: list[str]):
+        self.action_paths: list[str] = action_paths
+        self.actions: [core.ActionRuntime] = [core.ActionRuntime()]
         self.__init_action_definitions()
 
     def __init_action_definitions(self):
@@ -26,10 +26,38 @@ class ActionManager(object):
             action_def = core.ActionDefinition.from_json(json_data)
             ActionManager.action_definitions[j] = action_def
 
-    def create_action(self, action_name: str) -> core.ActionRuntime:
+        ActionManager.__filtered_actions = ActionManager.action_definitions
 
-        action_path_def_pair = next((a for a in ActionManager.action_definitions.items() if action_name == a[1].name),
-                                    None)
+    def set_current_engine(self, engine_name):
+        ActionManager.__filtered_actions = {}
+        for (path, action_def) in ActionManager.action_definitions.items():
+            if engine_name.lower() in action_def.supported_engines:
+                ActionManager.__filtered_actions[path] = action_def
+
+    def get_action_definition_by_name(self, name: str) -> core.ActionDefinition:
+        return next((ad for (p, ad) in ActionManager.action_definitions.items() if name.lower() in ad.label.lower()),
+                    None)
+
+    def get_all_action_definitions(self) -> [core.ActionDefinition]:
+        definitions = []
+        for (path, action_def) in ActionManager.action_definitions.items():
+            definitions.append(action_def)
+        return definitions
+
+    def get_action_definitions_by_engine(self, engine_name: str) -> [core.ActionDefinition]:
+        definitions = []
+        for (path, action_def) in ActionManager.action_definitions.items():
+            if engine_name.lower() in action_def.supported_engines:
+                definitions.append(action_def)
+        return definitions
+
+    def create_action(self, action_name: str) -> core.ActionRuntime | None:
+        if len(self.actions) == 1 and self.actions[0].definition is None:
+            self.actions.clear()
+
+        action_path_def_pair = next(
+            ((p, a) for (p, a) in ActionManager.__filtered_actions.items() if action_name == a.name),
+            None)
 
         if action_path_def_pair is None:
             return None
@@ -90,10 +118,3 @@ class ActionManager(object):
         for n in names:
             actions.extend(self.get_actions_by_name(n))
         return actions
-
-    def get_actions_by_engine(self, engine: str) -> [core.ActionRuntime]:
-        return [a for a in self.actions if engine in a.definition.supported_engines]
-
-    def get_actions_by_entity_extensions(self, extensions: [str]) -> [core.ActionRuntime]:
-        # TODO: Filter actions by the entity extensions supported by the engine
-        return []

@@ -9,25 +9,25 @@ class ActionDefinition(object):
     # current_count = 0
 
     def __init__(self,
-                 label: str,
-                 exec_path: str,
+                 label: str = "dummy_action_def",
+                 exec_path: str = "dummy/path/action.py",
                  inputs: [core.ActionData] = None,
                  outputs: [core.ActionData] = None,
                  supported_engines: [str] = None):
-        self.label = label
+        self.label: str = label
 
-        self.name = path_utils.get_name_from_label(self.label)
+        self.name: str = path_utils.get_name_from_label(self.label)
         # self.id = self.name + "_" + str(ActionDefinition.current_count)
 
-        self.exec_path = exec_path
-        self.inputs = inputs
-        self.outputs = outputs
-        self.supported_engines = supported_engines
+        self.exec_path: str = exec_path
+        self.inputs: list[core.ActionData] = inputs
+        self.outputs: list[core.ActionData] = outputs
+        self.supported_engines: list[str] = supported_engines
 
         # ActionDefinition.current_count += 1
 
     # Covert current ActionDefinition object from dict to string
-    def __str__(self):
+    def __str__(self) -> str:
         def_data = self.__dict__
         # For each input, convert it from string to a dictionary
         def_data['inputs'] = [json_utils.json_to_dict(i.to_json()) for i in self.inputs]
@@ -46,8 +46,8 @@ class ActionDefinition(object):
         # TODO: Throw exceptions on fail
         json_dict = json_utils.json_to_dict(json_data)
 
-        action = ActionDefinition(json_dict['label'],
-                                  json_dict['exec_path'])
+        action_def = ActionDefinition(json_dict['label'],
+                                      json_dict['exec_path'])
 
         # For each input as a dictionary, convert it to a string and then convert it to a ActionData object
         inputs_arr = json_dict['inputs']
@@ -61,16 +61,9 @@ class ActionDefinition(object):
         for o in outputs_arr:
             outputs.append(core.ActionData.from_json(json_utils.dict_to_json(o)))
 
-        action.inputs = inputs
-        action.outputs = outputs
+        action_def.inputs = inputs
+        action_def.outputs = outputs
 
-        action.supported_engines = json_dict['supported_engines']
+        action_def.supported_engines = json_dict['supported_engines']
 
-        return action
-
-
-if __name__ == "__main__":
-    data = path_utils.read_file('/taskprocessor/resources/my_example_task.json')
-    action = ActionDefinition.from_json(data)
-    print("Action Object: {0}".format(action.__dict__))
-    print("Action JSON: {0}".format(action.to_json()))
+        return action_def

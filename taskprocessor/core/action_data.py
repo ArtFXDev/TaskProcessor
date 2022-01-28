@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any
 
 from enum import Enum
 
@@ -17,22 +18,18 @@ class ActionDataType(Enum):
 
 
 class ActionData(object):
-    # current_count = 0
 
     def __init__(self,
-                 label: str,
+                 label: str = "Action Dummy Data",
                  data_type: ActionDataType = ActionDataType.Empty,
-                 value=None):
-        self.label = label
-        self.name = path_utils.get_name_from_label(self.label)
-        # self.id = self.name + "_" + str(ActionData.current_count)
-        self.type = data_type
-        self.value = value
-
-        # ActionData.current_count += 1
+                 value: Any = None):
+        self.label: str = label
+        self.name: str = path_utils.get_name_from_label(self.label)
+        self.type: ActionDataType = data_type
+        self.value: Any = value
 
     # Covert current ActionData object from dict to string
-    def __str__(self):
+    def __str__(self) -> str:
         data = self.__dict__
         # Convert ActionDataType enum to string
         data['type'] = self.type.name

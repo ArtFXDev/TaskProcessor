@@ -15,7 +15,7 @@
     }
   ],
   "supported_engines": [
-    "maya"
+    "python"
   ],
   "exec_path": "random_name_gen.py"
 }
