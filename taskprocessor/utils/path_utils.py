@@ -82,7 +82,6 @@ def get_temp_file(file_contents: str, name: str | None = None, extension: str = 
         extension = '.' + extension
 
     file = tempfile.NamedTemporaryFile(prefix=name, suffix=extension, delete=False)
-    # file = tempfile.NamedTemporaryFile(prefix=name, suffix=extension)
     file.write(file_contents.encode('utf-8'))
     file.seek(0)
     return file

@@ -52,10 +52,15 @@ class MyTestCase(unittest.TestCase):
             print(e.path)
         print("\n")
 
-        # Initialize Action manager
+        # Initialize Action definition provider
         action_paths = ["../actions"]
-        am = core.ActionManager(action_paths)
-        am.set_current_engine(eg.current_engine.name)
+        adp = core.ActionDefinitionProvider(action_paths)
+        if len(adp.get_all()) == 0:
+            print("No action definitions found")
+            return False
+
+        # Initialze Action Manager
+        am = core.ActionManager(adp)
 
         # Create three action runtimes (Similar to adding three nodes in the UI)
         action_random_name_gen = am.create_action("random_name_generator")
@@ -73,16 +78,29 @@ class MyTestCase(unittest.TestCase):
 
         # Change inputs
         # Set random name generation length
-        am.set_input(action_random_name_gen.id, 0, 12)
+        is_input_set = am.set_input(action_random_name_gen.id, 0, 12)
+        if not is_input_set:
+            print("Random name input not set")
+            return False
+
         # Set filepath
-        am.set_input(action_create_file.id,
+        is_input_set = am.set_input(action_create_file.id,
                      0,
                      '"D:/Personal_Work/Pipeline/TaskProcessor/TaskProcessor/build/gen_file.txt"')
+        if not is_input_set:
+            print("Create file input not set")
+            return False
 
         # Link filepath input of this node with output of create file node
-        am.link_input(action_write_file.id, 0, action_create_file.id, 0)
+        is_input_set = am.link_input(action_write_file.id, 0, action_create_file.id, 0)
+        if not is_input_set:
+            print("Failed to link create file output to write file input")
+            return False
         # Link filepath input of this node with output of create file node
-        am.link_input(action_write_file.id, 1, action_random_name_gen.id, 0)
+        is_input_set = am.link_input(action_write_file.id, 1, action_random_name_gen.id, 0)
+        if not is_input_set:
+            print("Failed to link random name output to write file input")
+            return False
 
         print('\n')
         proc = core.Processor(eg)
