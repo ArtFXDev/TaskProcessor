@@ -1,8 +1,6 @@
 from __future__ import annotations
 from typing import Any
 
-from pathlib import Path
-
 import taskprocessor.core as core
 import taskprocessor.utils.path_utils as path_utils
 
@@ -15,8 +13,11 @@ class ActionRuntime(object):
     def __init__(self, definition: core.ActionDefinition = None):
         self.definition: core.ActionDefinition = definition
 
-        self.input_params: dict[str, Any] = {}
-        self.output_params: dict[str, Any] = {}
+        # input_params is a dictionary with id of input as key and any value.
+        # If the input to action comes from another action, we store a tuple of output index of the other action,
+        # and the reference to the other action.
+        self.input_params: dict[str, str | int | float | bool | tuple[str, core.ActionRuntime]] = {}
+        self.output_params: dict[str, str | int | float | bool] = {}
 
         self.id: str = ""
         if self.definition is not None:
@@ -39,8 +40,20 @@ class ActionRuntime(object):
             self.id = self.definition.name
             ActionRuntime.__id_dict[self.definition.name] = 0
 
-    def get_input_output_id(self, input_output_name) -> str:
+    def get_input_output_id(self, input_output_name: str) -> str:
         return self.id + "_" + input_output_name
+
+    def get_input_index(self, input_id: str) -> int:
+        input_name = input_id
+        if self.id in input_name:
+            input_name = input_name.replace(self.id + "_", "")
+        return next((i for (i, v) in enumerate(self.definition.inputs) if input_name == v.name), -1)
+
+    def get_output_index(self, output_id: str) -> int:
+        output_name = output_id
+        if self.id in output_name:
+            output_name = output_name.replace(self.id + "_", "")
+        return next((i for (i, v) in enumerate(self.definition.outputs) if output_name == v.name), -1)
 
     # Initializes executable code by substituting variable names.
     # Variable names will have the form <action_runtime_id>_<input/output_name>
@@ -62,8 +75,8 @@ class ActionRuntime(object):
 
     @staticmethod
     def __is_value_of_type(value: Any, expected_type: core.ActionDataType) -> bool:
-        if expected_type == core.ActionDataType.Path:
-            if type(value) == Path or type(value) == str:
+        if expected_type == core.ActionDataType.Path or expected_type == core.ActionDataType.String:
+            if type(value) == str:
                 return True
         elif expected_type == core.ActionDataType.Boolean:
             if type(value) == bool:
@@ -114,8 +127,8 @@ class ActionRuntime(object):
             return False
 
         input_id = self.get_input_output_id(self.definition.inputs[input_index].name)
-        self.input_params[input_id] = link_action.get_input_output_id(
-            link_action.definition.outputs[link_output_index].name)
+        output_id = link_action.get_input_output_id(link_action.definition.outputs[link_output_index].name)
+        self.input_params[input_id] = (output_id, link_action)
         return True
 
     # Remove the input link
@@ -131,7 +144,10 @@ class ActionRuntime(object):
 
         # Replace all inputs in code with linked output variable names
         for (param_id, value) in self.input_params.items():
-            self.exec_code = self.exec_code.replace(param_id, str(value))
+            if type(value) == tuple:
+                self.exec_code = self.exec_code.replace(param_id, value[0])
+            else:
+                self.exec_code = self.exec_code.replace(param_id, str(value))
 
         # print("Code after substitution: \n{}".format(self.exec_code))
         return self.exec_code

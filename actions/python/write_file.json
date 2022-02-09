@@ -14,7 +14,9 @@
   ],
   "outputs": [],
   "supported_engines": [
-    "python"
+    "python",
+    "maya",
+    "houdini"
   ],
   "exec_path": "write_file.py"
 }

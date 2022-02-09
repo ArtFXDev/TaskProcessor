@@ -102,11 +102,23 @@ class MyTestCase(unittest.TestCase):
             print("Failed to link random name output to write file input")
             return False
 
-        print('\n')
-        proc = core.Processor(eg)
-        proc.create_job(em.entities, am.actions)
-        proc.start()
-        print('\n')
+        am.actions.reverse()
+
+        print("Original action order: ")
+        for a in am.actions:
+            print(a.definition.name)
+
+        node_graph = core.NodeGraph(am.actions)
+        print("\n")
+        print("Sorted action order: ")
+        node_graph.sort()
+        print("\n")
+
+        # print('\n')
+        # proc = core.Processor(eg)
+        # proc.create_job(em.entities, am.actions)
+        # proc.start()
+        # print('\n')
 
         print("<----COMPLETED TASK EXECUTION TEST---->")
 

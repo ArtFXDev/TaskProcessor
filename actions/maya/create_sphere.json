@@ -1,0 +1,26 @@
+{
+  "label": "Create Sphere",
+  "inputs": [
+    {
+      "label": "Name",
+      "type": "String",
+      "value": "Sphere"
+    },
+    {
+      "label": "Radius",
+      "type": "Float",
+      "value": 1.0
+    }
+  ],
+  "outputs": [
+    {
+      "label": "Name",
+      "type": "String",
+      "value": "Sphere"
+    }
+  ],
+  "supported_engines": [
+    "maya"
+  ],
+  "exec_path": "create_sphere.py"
+}

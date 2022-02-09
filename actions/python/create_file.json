@@ -15,7 +15,9 @@
     }
   ],
   "supported_engines": [
-    "python"
+    "python",
+    "maya",
+    "houdini"
   ],
   "exec_path": "create_file.py"
 }
