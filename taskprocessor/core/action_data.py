@@ -3,7 +3,6 @@ from typing import Any
 
 from enum import Enum
 
-import taskprocessor.core as core
 import taskprocessor.utils.path_utils as path_utils
 import taskprocessor.utils.json_utils as json_utils
 
@@ -11,10 +10,19 @@ import taskprocessor.utils.json_utils as json_utils
 class ActionDataType(Enum):
     Empty = 0,
     Boolean = 1,
-    String = 2,
-    Integer = 3,
-    Float = 4,
-    Path = 5
+    Integer = 2,
+    Float = 3,
+    String = 4,
+    Path = 5,
+    Vector2 = 6,
+    Vector3 = 7,
+    Vector4 = 8,
+    Object = 9
+
+
+class ActionDataValueVariable(Enum):
+    ENTITY_PATH = 0,
+    ENTITY_NAME = 1
 
 
 class ActionData(object):

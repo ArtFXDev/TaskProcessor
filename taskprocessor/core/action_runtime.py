@@ -6,54 +6,24 @@ import taskprocessor.utils.path_utils as path_utils
 
 
 class ActionRuntime(object):
-    # A dictionary with the action name as key and a counter as value.
-    # The counter is used to generate ID.
-    __id_dict: dict[str, int] = {"dummy": 0}
 
     def __init__(self, definition: core.ActionDefinition = None):
         self.definition: core.ActionDefinition = definition
-
         # input_params is a dictionary with id of input as key and any value.
         # If the input to action comes from another action, we store a tuple of output index of the other action,
         # and the reference to the other action.
-        self.input_params: dict[str, str | int | float | bool | tuple[str, core.ActionRuntime]] = {}
-        self.output_params: dict[str, str | int | float | bool] = {}
+        self.input_params: dict[
+            core.ID, str | int | float | bool | core.ActionDataValueVariable | tuple[core.ID, core.ActionRuntime]] = {}
+        self.output_params: dict[core.ID, str | int | float | bool] = {}
 
         self.id: str = ""
         if self.definition is not None:
-            self.__gen_id()
+            self.id = core.IdProvider.generate_action_id(self.definition.name)
 
         self.exec_code: str = ""
 
         if self.definition is not None:
             self.__init_exec_code()
-
-    # Generates ID for each ActionRuntime instance.
-    # ID will have the form <action_name>_<count>
-    def __gen_id(self):
-        if self.definition.name in ActionRuntime.__id_dict:
-            count = ActionRuntime.__id_dict[self.definition.name]
-            count += 1
-            self.id = self.definition.name + "_" + str(count)
-            ActionRuntime.__id_dict[self.definition.name] = count
-        else:
-            self.id = self.definition.name
-            ActionRuntime.__id_dict[self.definition.name] = 0
-
-    def get_input_output_id(self, input_output_name: str) -> str:
-        return self.id + "_" + input_output_name
-
-    def get_input_index(self, input_id: str) -> int:
-        input_name = input_id
-        if self.id in input_name:
-            input_name = input_name.replace(self.id + "_", "")
-        return next((i for (i, v) in enumerate(self.definition.inputs) if input_name == v.name), -1)
-
-    def get_output_index(self, output_id: str) -> int:
-        output_name = output_id
-        if self.id in output_name:
-            output_name = output_name.replace(self.id + "_", "")
-        return next((i for (i, v) in enumerate(self.definition.outputs) if output_name == v.name), -1)
 
     # Initializes executable code by substituting variable names.
     # Variable names will have the form <action_runtime_id>_<input/output_name>
@@ -63,31 +33,42 @@ class ActionRuntime(object):
 
         sub_var_names = []
         for i in self.definition.inputs:
-            input_id = self.get_input_output_id(i.name)
-            sub_var_names.append(input_id)
+            input_id = core.IdProvider.generate_io_id(True, self.definition.name, i.name)
+            sub_var_names.append(str(input_id))
             self.input_params[input_id] = i.value
         for o in self.definition.outputs:
-            output_id = self.get_input_output_id(o.name)
-            sub_var_names.append(output_id)
+            output_id = core.IdProvider.generate_io_id(False, self.definition.name, o.name)
+            sub_var_names.append(str(output_id))
             self.output_params[output_id] = o.value
 
         self.exec_code = self.exec_code.format(*sub_var_names)
 
     @staticmethod
     def __is_value_of_type(value: Any, expected_type: core.ActionDataType) -> bool:
-        if expected_type == core.ActionDataType.Path or expected_type == core.ActionDataType.String:
-            if type(value) == str:
-                return True
+        if expected_type == core.ActionDataType.Empty:
+            return True
         elif expected_type == core.ActionDataType.Boolean:
             if type(value) == bool:
-                return True
-        elif expected_type == core.ActionDataType.Float:
-            if type(value) == float:
                 return True
         elif expected_type == core.ActionDataType.Integer:
             if type(value) == int:
                 return True
-        elif expected_type == core.ActionDataType.Empty:
+        elif expected_type == core.ActionDataType.Float:
+            if type(value) == float:
+                return True
+        elif expected_type == core.ActionDataType.String or expected_type == core.ActionDataType.Path:
+            if type(value) == str:
+                return True
+        elif expected_type == core.ActionDataType.Vector2:
+            if type(value) == list and len(value) == 2:
+                return True
+        elif expected_type == core.ActionDataType.Vector3:
+            if type(value) == list and len(value) == 3:
+                return True
+        elif expected_type == core.ActionDataType.Vector4:
+            if type(value) == list and len(value) == 4:
+                return True
+        elif expected_type == core.ActionDataType.Object:
             return True
         return False
 
@@ -95,10 +76,15 @@ class ActionRuntime(object):
     def set_input(self, input_index: int, value) -> bool:
         if input_index >= len(self.definition.inputs):
             return False
-        if not ActionRuntime.__is_value_of_type(value, self.definition.inputs[input_index].type):
+        # if not ActionRuntime.__is_value_of_type(value, self.definition.inputs[input_index].type):
+        #     return False
+
+        if self.definition.inputs[input_index].type == core.ActionDataType.Object:
+            # TODO: Add error logging
+            print("Setting input of type: {} is not allowed".format(self.definition.inputs[input_index].type.name))
             return False
 
-        input_id = self.get_input_output_id(self.definition.inputs[input_index].name)
+        input_id = list(self.input_params.keys())[input_index]
         self.input_params[input_id] = value
         return True
 
@@ -107,7 +93,7 @@ class ActionRuntime(object):
         if input_index >= len(self.definition.inputs):
             return False
 
-        input_id = self.get_input_output_id(self.definition.inputs[input_index].name)
+        input_id = list(self.input_params.keys())[input_index]
         self.input_params[input_id] = self.definition.inputs[input_index].value
         return True
 
@@ -126,8 +112,8 @@ class ActionRuntime(object):
                           link_action.definition.outputs[link_output_index].type))
             return False
 
-        input_id = self.get_input_output_id(self.definition.inputs[input_index].name)
-        output_id = link_action.get_input_output_id(link_action.definition.outputs[link_output_index].name)
+        input_id = list(self.input_params.keys())[input_index]
+        output_id = list(link_action.output_params.keys())[link_output_index]
         self.input_params[input_id] = (output_id, link_action)
         return True
 
@@ -138,16 +124,43 @@ class ActionRuntime(object):
         self.reset_input(input_index)
         return True
 
+    @staticmethod
+    def __get_value_from_variable(entity: core.Entity, variable: core.ActionDataValueVariable):
+        if variable == core.ActionDataValueVariable.ENTITY_PATH:
+            return entity.path
+        elif variable == core.ActionDataValueVariable.ENTITY_NAME:
+            return entity.filename
+
     # Gets the final executable code with properly substituted variables names and values.
-    def get_exec_code(self) -> str:
+    def get_exec_code(self, entity: core.Entity) -> str:
         # print("Code before substitution: \n{}".format(self.exec_code))
 
         # Replace all inputs in code with linked output variable names
+        tmp_code = str(self.exec_code)
         for (param_id, value) in self.input_params.items():
-            if type(value) == tuple:
-                self.exec_code = self.exec_code.replace(param_id, value[0])
-            else:
-                self.exec_code = self.exec_code.replace(param_id, str(value))
+            code_val = value
 
-        # print("Code after substitution: \n{}".format(self.exec_code))
-        return self.exec_code
+            if type(value) == tuple:
+                code_val = value[0]
+            elif type(value) == core.ActionDataValueVariable:
+                code_val = ActionRuntime.__get_value_from_variable(entity, value)
+            elif type(value) == str and value.find('$') > -1:
+                # Find all the variables present in the value
+                found_variables: list[core.ActionDataValueVariable] = []
+                for var in core.ActionDataValueVariable:
+                    if var.name in value:
+                        found_variables.append(var)
+                # Replace each variable with its actual value
+                for v in found_variables:
+                    value = value.replace(f'${v.name}', ActionRuntime.__get_value_from_variable(entity, v))
+                code_val = value
+
+            # Make sure all string values are converted to literals (with "" quotes)
+            if type(code_val) == str:
+                code_val = path_utils.get_str_literals(code_val)
+
+            # Replace all input variables by their values or reference to other variables
+            tmp_code = tmp_code.replace(str(param_id), str(code_val))
+
+        # print("Code after substitution: \n{}".format(tmp_code))
+        return tmp_code

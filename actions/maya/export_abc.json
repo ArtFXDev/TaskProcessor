@@ -17,13 +17,7 @@
       "value": ""
     }
   ],
-  "outputs": [
-    {
-      "label": "Name",
-      "type": "String",
-      "value": "Sphere"
-    }
-  ],
+  "outputs": [],
   "supported_engines": [
     "maya"
   ],

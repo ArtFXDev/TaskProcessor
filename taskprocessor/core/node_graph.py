@@ -21,6 +21,9 @@ class NodeGraph(object):
                     node_attrib = core.NodeAttribute(n, input_id, input_value[0], other_node)
                     n.add_adjacent_node(node_attrib)
 
+        # Sort nodes in proper execution order
+        self.__sort()
+
     def print_graph(self):
         for n in self.nodes:
             print("\n")
@@ -36,7 +39,7 @@ class NodeGraph(object):
                 self.__sort_helper(nd.other_node, visited, stack)
         stack.append(node)
 
-    def sort(self):
+    def __sort(self):
         visited: dict[core.Node, bool] = {}
         node_stack: list[core.Node] = []
         for n in self.nodes:
@@ -46,11 +49,13 @@ class NodeGraph(object):
             if visited[n] is False:
                 self.__sort_helper(n, visited, node_stack)
 
-        # while len(node_stack) > 0:
-        #     n = node_stack.pop()
-        #     print(n.action.definition.name)
-        for n in node_stack:
-            print(n.action.definition.name)
+        self.nodes = node_stack
+
+    def get_actions(self) -> list[core.ActionRuntime]:
+        actions: list[core.ActionRuntime] = []
+        for n in self.nodes:
+            actions.append(n.action)
+        return actions
 
 
 

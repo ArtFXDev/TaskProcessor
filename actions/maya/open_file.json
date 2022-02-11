@@ -1,0 +1,21 @@
+{
+  "label": "Open File",
+  "inputs": [
+    {
+      "label": "Filepath",
+      "type": "Path",
+      "value": ""
+    }
+  ],
+  "outputs": [
+    {
+      "label": "Filepath",
+      "type": "Path",
+      "value": ""
+    }
+  ],
+  "supported_engines": [
+    "maya"
+  ],
+  "exec_path": "open_file.py"
+}
