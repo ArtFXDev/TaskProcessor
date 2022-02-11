@@ -7,6 +7,15 @@ import tempfile
 from pathlib import Path
 
 
+def get_str_literals(string: str) -> str:
+    new_string = str(string)
+    if not new_string.startswith('"'):
+        new_string = f'"{new_string}'
+    if not new_string.endswith('"'):
+        new_string = f'{new_string}"'
+    return new_string
+
+
 def get_name_from_path(path: str | Path) -> str:
     return Path(path).name
 
@@ -20,13 +29,13 @@ def get_extension(path: str | Path) -> str:
 
 
 def get_absolute_path(relative_path: str | Path, cwd: str | Path | None = None) -> str:
-    if cwd is None:
-        return str(Path(relative_path).absolute())
-    else:
+    path = Path(relative_path)
+    if cwd is not None:
         if Path(cwd).is_file():
-            return Path(cwd).parent / relative_path
+            path = Path(cwd).parent / Path(relative_path)
         else:
-            return Path(cwd) / relative_path
+            path = Path(cwd) / Path(relative_path)
+    return path.resolve().as_posix()
 
 
 def list_files(path: str | Path, recursive: bool = True, extensions: list[str] | None = None) -> list[str]:
@@ -41,9 +50,10 @@ def list_files(path: str | Path, recursive: bool = True, extensions: list[str] |
 
     # Check if already a file
     if path.is_file():
+        ext = path.suffix.lower()[1:]
         # Check if the file has given extension or else return None
-        if extensions is not None and path.suffix.lower() in extensions:
-            return [str(path.absolute())]
+        if extensions is not None and ext in extensions:
+            return [str(path.resolve().as_posix())]
         else:
             return []
 
@@ -53,18 +63,18 @@ def list_files(path: str | Path, recursive: bool = True, extensions: list[str] |
     if extensions is None:
         if recursive:
             for p in path.rglob('*.*'):
-                found_files.append(str(p.absolute()))
+                found_files.append(str(p.resolve().as_posix()))
         else:
             for p in path.glob('*.*'):
-                found_files.append(str(p.absolute()))
+                found_files.append(str(p.resolve().as_posix()))
     else:
         for e in extensions:
             if recursive:
                 for p in path.rglob('*.{}'.format(e)):
-                    found_files.append(str(p.absolute()))
+                    found_files.append(str(p.resolve().as_posix()))
             else:
                 for p in path.glob('*.{}'.format(e)):
-                    found_files.append(str(p.absolute()))
+                    found_files.append(str(p.resolve().as_posix()))
 
     return found_files
 
@@ -82,7 +92,6 @@ def get_temp_file(file_contents: str, name: str | None = None, extension: str = 
         extension = '.' + extension
 
     file = tempfile.NamedTemporaryFile(prefix=name, suffix=extension, delete=False)
-    # file = tempfile.NamedTemporaryFile(prefix=name, suffix=extension)
     file.write(file_contents.encode('utf-8'))
     file.seek(0)
     return file

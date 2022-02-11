@@ -15,7 +15,9 @@
     }
   ],
   "supported_engines": [
-    "python"
+    "python",
+    "maya",
+    "houdini"
   ],
   "exec_path": "random_name_gen.py"
 }

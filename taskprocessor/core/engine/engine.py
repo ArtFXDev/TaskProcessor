@@ -66,25 +66,28 @@ class Engine(object):
     def __execute(self, entity_path: str, exec_file: io.TextIOWrapper):
         is_success = True
 
-        args = [self.current_engine.exec_path, exec_file.name]
-        with subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as subp:
-            stdout = subp.stdout.read().decode()
-            stderr = subp.stderr.read().decode()
+        # Sanitize executable file path
+        exec_path = path_utils.get_absolute_path(exec_file.name)
+        # exec_path = path_utils.get_str_literals(exec_path)
 
-            if len(stderr) > 0:
-                is_success = False
+        args = [self.current_engine.exec_path, exec_path]
 
-            # TODO: Add better status text handling
-            status = """
-            Execution Status: IN-PROGRESS
-            Execution Output: {0}
-            Execution Error: {1}
-            """.format(stdout, stderr, 1.0)
-
+        subp = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        for o in iter(subp.stderr.readline, b''):
+            # # TODO: Add better status text handling
+            # status = """
+            # Execution Status: IN-PROGRESS
+            # Execution Output: {0}
+            # Execution Error: {1}
+            # """.format("", o, 1.0)
             for p in self.__progress_listeners:
-                p(entity_path, 1.0, status)
+                p(entity_path, 1.0, o.decode("utf-8"))
+        subp.stdout.close()
+        subp.stderr.close()
+        subp.wait()
 
-        is_success = is_success and path_utils.delete_temp_file(exec_file)
+        is_tmp_deleted = path_utils.delete_temp_file(exec_file)
+        is_success = is_success and is_tmp_deleted
 
         # TODO: Add better status text handling
         exec_complete_status = """

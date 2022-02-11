@@ -1,21 +1,21 @@
 {
-  "label": "Create File",
+  "label": "Open File",
   "inputs": [
     {
-      "label": "Input Filepath",
+      "label": "Filepath",
       "type": "Path",
       "value": ""
     }
   ],
   "outputs": [
     {
-      "label": "Output Filepath",
+      "label": "Filepath",
       "type": "Path",
       "value": ""
     }
   ],
   "supported_engines": [
-    "python"
+    "maya"
   ],
-  "exec_path": "create_file.py"
+  "exec_path": "open_file.py"
 }

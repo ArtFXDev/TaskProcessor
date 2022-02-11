@@ -1,11 +1,6 @@
 from __future__ import annotations
 
-import six
-
-if six.PY2:
-    from pathlib2 import Path
-else:
-    from pathlib import Path
+from pathlib import Path
 
 import taskprocessor.utils.path_utils as path_utils
 import taskprocessor.core as core

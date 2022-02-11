@@ -1,0 +1,9 @@
+{
+  "label": "Save File",
+  "inputs": [],
+  "outputs": [],
+  "supported_engines": [
+    "maya"
+  ],
+  "exec_path": "save_file.py"
+}
