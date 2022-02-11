@@ -182,6 +182,30 @@ class MyTestCase(unittest.TestCase):
 
         print("<----COMPLETED TASK EXECUTION TEST---->")
 
+    def test_task_serialization(self):
+        # Initialize Action definition provider
+        action_paths = ["../actions"]
+        adp = core.ActionDefinitionProvider(action_paths)
+        if len(adp.get_all()) == 0:
+            print("No action definitions found")
+            return False
+
+        # Initialize Action Manager
+        am = core.ActionManager(adp)
+
+        # Create actions
+        # self.create_python_example_actions(am)
+        self.create_maya_example_actions(am)
+
+        # Create node graph for the actions
+        node_graph = core.NodeGraph(am.actions)
+
+        task = core.Task(None, node_graph.get_actions(), "Maya Alembic Export Task")
+        print("Complete JSON:")
+        print(task.to_json(include_action_def=True, include_action_init_code=True))
+        # print("Min JSON:")
+        # print(task.to_json(False, False))
+
     def test_engine(self):
         print("<----RUNNING ENGINE TEST---->")
 

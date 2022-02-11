@@ -33,21 +33,21 @@ class ActionManager(object):
         del action
         return True
 
-    def set_input(self, action_id: str, input_index: int, value) -> bool:
+    def set_input(self, action_id: core.ID, input_index: int, value) -> bool:
         action = self.get_action_by_id(action_id)
         if action is None:
             return False
         return action.set_input(input_index, value)
 
-    def reset_input(self, action_id: str, input_index: int) -> bool:
+    def reset_input(self, action_id: core.ID, input_index: int) -> bool:
         action = self.get_action_by_id(action_id)
         if action is None:
             return False
         return action.reset_input(input_index)
 
-    def link_input(self, current_action_id: str,
+    def link_input(self, current_action_id: core.ID,
                    current_input_index: int,
-                   source_action_id: str,
+                   source_action_id: core.ID,
                    source_output_index: int) -> bool:
         curr_action = self.get_action_by_id(current_action_id)
         if curr_action is None:
@@ -56,15 +56,14 @@ class ActionManager(object):
 
         return curr_action.link_input(current_input_index, src_action, source_output_index)
 
-    def unlink_input(self, action_id: str, input_index: int) -> bool:
+    def unlink_input(self, action_id: core.ID, input_index: int) -> bool:
         action = self.get_action_by_id(action_id)
         if action is None:
             return False
 
         return action.unlink_input(input_index)
 
-
-    def get_action_by_id(self, action_id: str) -> core.ActionRuntime:
+    def get_action_by_id(self, action_id: core.ID) -> core.ActionRuntime:
         return next((a for a in self.actions if action_id == a.id), None)
 
     def get_actions_by_name(self, name: str) -> [core.ActionRuntime]:

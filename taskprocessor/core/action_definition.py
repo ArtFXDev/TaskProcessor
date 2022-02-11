@@ -28,7 +28,8 @@ class ActionDefinition(object):
         def_data = self.__dict__
 
         # Remove filepath from final json
-        def_data.pop('filepath')
+        if def_data.get('filepath', None) is not None:
+            def_data.pop('filepath')
         # For each input, convert it from string to a dictionary
         def_data['inputs'] = [json_utils.json_to_dict(i.to_json()) for i in self.inputs]
         # For each output, convert it from string to a dictionary
@@ -42,7 +43,7 @@ class ActionDefinition(object):
 
     # Get a ActionDefinition object from json string
     @staticmethod
-    def from_json(json_data) -> ActionDefinition:
+    def from_json(json_data: str) -> ActionDefinition:
         # TODO: Throw exceptions on fail
         json_dict = json_utils.json_to_dict(json_data)
 

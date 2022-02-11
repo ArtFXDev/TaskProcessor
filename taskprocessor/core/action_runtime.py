@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Any
 
 import taskprocessor.core as core
+import taskprocessor.utils.json_utils as json_utils
 import taskprocessor.utils.path_utils as path_utils
 
 
@@ -16,7 +17,7 @@ class ActionRuntime(object):
             core.ID, str | int | float | bool | core.ActionDataValueVariable | tuple[core.ID, core.ActionRuntime]] = {}
         self.output_params: dict[core.ID, str | int | float | bool] = {}
 
-        self.id: str = ""
+        self.id: core.ID | None = None
         if self.definition is not None:
             self.id = core.IdProvider.generate_action_id(self.definition.name)
 
@@ -24,6 +25,74 @@ class ActionRuntime(object):
 
         if self.definition is not None:
             self.__init_exec_code()
+
+    def to_json(self, include_def: bool = True, include_init_code: bool = False) -> str:
+        inputs = []
+        for (i_id, value) in self.input_params.items():
+            if type(value) == core.ActionDataValueVariable:
+                value = value.name
+            elif type(value) == tuple:
+                value = {'connected_action_output_id': str(value[0]), 'connected_action_id': str(value[1].id)}
+            i_dict = {'id': str(i_id), 'value': value}
+            inputs.append(i_dict)
+
+        outputs = []
+        for (o_id, value) in self.output_params.items():
+            o_dict = {'id': str(o_id), 'value': value}
+            outputs.append(o_dict)
+
+        action_dict = {'id': str(self.id)}
+        if include_def:
+            action_dict['definition'] = json_utils.json_to_dict(self.definition.to_json())
+        else:
+            action_dict['definition'] = self.definition.filepath
+        action_dict['inputs'] = inputs
+        action_dict['outputs'] = outputs
+        if include_init_code:
+            action_dict['exec_code'] = self.exec_code
+        else:
+            action_dict['exec_code'] = ""
+
+        return json_utils.dict_to_json(action_dict)
+
+    @staticmethod
+    def from_json(json_data: str) -> ActionRuntime:
+        action_dict = json_utils.json_to_dict(json_data)
+
+        action_def = action_dict['definition']
+        if type(action_def) == str:
+            action_def = path_utils.read_file(action_def)
+        elif type(action_def) == dict:
+            action_def = json_utils.dict_to_json(action_def)
+
+        action_def = core.ActionDefinition.from_json(action_def)
+
+        action = ActionRuntime()
+        action.id = core.ID(action_dict['id'])
+        action.definition = action_def
+
+        inputs = {}
+        for i in action_dict['inputs']:
+            i_id = core.ID(i.get('id'))
+            value = i.get('value')
+            if type(value) == dict:
+                value = (core.ID(value.get('connected_action_output_id')),
+                         value.get('connected_action_id'))
+            else:
+                value = next((var for var in core.ActionDataValueVariable if value == var.name), value)
+            inputs[i_id] = value
+        action.input_params = inputs
+
+        outputs = {}
+        for o in action_dict['outputs']:
+            outputs[core.ID(o.get('id'))] = o.value
+        action.output_params = outputs
+
+        action.exec_code = action_dict['exec_code']
+        return action
+
+    def __str__(self) -> str:
+        return self.to_json(include_def=False, include_init_code=False)
 
     # Initializes executable code by substituting variable names.
     # Variable names will have the form <action_runtime_id>_<input/output_name>
