@@ -37,6 +37,10 @@ class ActionDefinition(object):
         # Return the string representation of dict of current object
         return json_utils.dict_to_json(def_data)
 
+    def get_main_engine(self) -> str:
+        # TODO: Prioritize engines in a smart way
+        return self.supported_engines[0]
+
     # Get json string from current ActionDefinition object
     def to_json(self) -> str:
         return self.__str__()

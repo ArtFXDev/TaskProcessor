@@ -23,7 +23,7 @@ class ActionManager(object):
 
         return action
 
-    def delete_action(self, action_id: str) -> bool:
+    def delete_action(self, action_id: core.ID) -> bool:
         action = self.get_action_by_id(action_id)
 
         if action is None:
