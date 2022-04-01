@@ -1,8 +1,9 @@
 import sys
 
 from Qt import QtWidgets
-from NodeGraphQt.NodeGraphQt import NodeGraph, BaseNode, BackdropNode, setup_context_menu
+from NodeGraphQt.NodeGraphQt import NodeGraph, setup_context_menu
 import taskprocessor.ui as ui
+import taskprocessor.ui.nodes as nodes
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
@@ -17,7 +18,6 @@ if __name__ == '__main__':
     # graph.register_node(BackdropNode)
 
     core_handler = ui.CoreHandler()
-
     for n in core_handler.nodes:
     # register example node into the node graph.
         graph.register_node(n)
@@ -35,6 +35,8 @@ if __name__ == '__main__':
 
     # auto layout nodes.
     graph.auto_layout_nodes()
+
+    graph.node_created.connect(lambda node: core_handler.init_node(node))
 
     # disconnect invalid types
     graph.port_connected.connect(lambda ip, op: op.disconnect_from(ip) if(ip.data_type != op.data_type) else None)

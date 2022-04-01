@@ -46,6 +46,14 @@ class Task(object):
 
     def get_code(self):
         final_code = ""
-        for action in self.actions:
-            final_code += "\n" + action.get_exec_code(self.entity)
+        for (index, action) in enumerate(self.actions):
+            # TODO: Find a better way to embed action id
+            action_id_text = core.ACTION_EXECUTION_STARTED_STRING.format(action_id=str(action.id))
+            final_code += f'print("{action_id_text}")\n'
+
+            final_code += action.get_exec_code(self.entity)
+
+            # TODO: Find a better way to deal with action progress
+            prog_text = core.ACTION_EXECUTION_PROGRESS_STRING.format(progress=float(index + 1) / len(self.actions))
+            final_code += f'\nprint("{prog_text}")\n'
         return final_code

@@ -141,6 +141,12 @@ class ActionRuntime(object):
             return True
         return False
 
+    def get_input_id(self, input_index: int) -> core.ID:
+        return list(self.input_params.keys())[input_index]
+
+    def get_output_id(self, output_index: int) -> core.ID:
+        return list(self.output_params.keys())[output_index]
+
     # Links the value of an input with its input_id
     def set_input(self, input_index: int, value) -> bool:
         if input_index >= len(self.definition.inputs):
@@ -153,7 +159,7 @@ class ActionRuntime(object):
             print("Setting input of type: {} is not allowed".format(self.definition.inputs[input_index].type.name))
             return False
 
-        input_id = list(self.input_params.keys())[input_index]
+        input_id = self.get_input_id(input_index)
         self.input_params[input_id] = value
         return True
 
@@ -162,7 +168,7 @@ class ActionRuntime(object):
         if input_index >= len(self.definition.inputs):
             return False
 
-        input_id = list(self.input_params.keys())[input_index]
+        input_id = self.get_input_id(input_index)
         self.input_params[input_id] = self.definition.inputs[input_index].value
         return True
 
@@ -181,8 +187,8 @@ class ActionRuntime(object):
                           link_action.definition.outputs[link_output_index].type))
             return False
 
-        input_id = list(self.input_params.keys())[input_index]
-        output_id = list(link_action.output_params.keys())[link_output_index]
+        input_id = self.get_input_id(input_index)
+        output_id = link_action.get_output_id(link_output_index)
         self.input_params[input_id] = (output_id, link_action)
         return True
 

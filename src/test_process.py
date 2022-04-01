@@ -145,6 +145,7 @@ class MyTestCase(unittest.TestCase):
         # Initialize Entities
         em = core.EntityManager()
         em.extensions = eg.current_engine.extensions
+        # em.add_entity('../resources/example_maya_entities/maya_entity_01.ma')
         em.add_entity('../resources/example_maya_entities')
 
         if len(em.entities) == 0:

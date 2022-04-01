@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import taskprocessor.ui.nodes as nodes
-from taskprocessor.core import ActionDefinition, ActionRuntime
+from taskprocessor.core import ActionDataType, ActionDefinition, ActionRuntime
 
 
 def node_prototype_constructor(self):
@@ -19,12 +19,12 @@ class BaseNodeTP(nodes.BaseNode):
 
     def __init__(self):
         super(BaseNodeTP, self).__init__()
-        self.action_runtime: ActionRuntime | None = None
-        self.add_input()
+        self.action: ActionRuntime | None = None
+        self.is_initialized: bool = False
 
     @staticmethod
     def create_node_class_from_def(action_def: ActionDefinition):
-        node_name = action_def.name.title().replace('_', '')
+        node_name = action_def.name.title().strip().replace('_', '')
         node_color = nodes.NODE_COLORS[action_def.get_main_engine()]
         node_class = type(node_name, (BaseNodeTP,), {
             "__init__": node_prototype_constructor,
@@ -40,3 +40,22 @@ class BaseNodeTP(nodes.BaseNode):
                 action_def.outputs]
         })
         return node_class
+
+    def initialize(self, action: ActionRuntime):
+        self.action = action
+        self.set_name(str(action.id).title().replace('_', ''))
+
+        for (index, i) in enumerate(action.definition.inputs):
+            if i.type == ActionDataType.Path:
+                self.add_file_input(str(action.get_input_id(index)), i.label, i.value)
+            elif i.type == ActionDataType.String:
+                self.add_text_input(str(action.get_input_id(index)), i.label, i.value)
+            elif i.type == ActionDataType.Float:
+                self.add_float_input(str(action.get_input_id(index)), i.label, i.value)
+            elif i.type == ActionDataType.Integer:
+                self.add_int_input(str(action.get_input_id(index)), i.label, i.value)
+            elif i.type == ActionDataType.Boolean:
+                self.add_checkbox(str(action.get_input_id(index)), i.label, i.value)
+
+        self.draw()
+        self.is_initialized = True

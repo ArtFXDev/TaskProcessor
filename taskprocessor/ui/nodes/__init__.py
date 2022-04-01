@@ -18,7 +18,7 @@ NODE_IO_TYPE_COLORS = {
 }
 
 NODE_COLORS = {
-    "maya": (3, 155, 156),
-    "python": (255, 202, 29),
-    "houdini": (254, 71, 3)
+    "maya": (2, 104, 105),
+    "python": (36, 83, 121),
+    "houdini": (177, 49, 2)
 }
