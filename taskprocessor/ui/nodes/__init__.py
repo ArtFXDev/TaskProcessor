@@ -1,8 +1,4 @@
-from NodeGraphQt.NodeGraphQt import BaseNode
-
-from .base_node_tp import BaseNodeTP
-
-from taskprocessor.core import ActionDataType
+from taskprocessor.ui import ActionDataType
 
 NODE_IO_TYPE_COLORS = {
     ActionDataType.Empty: (33, 33, 33),
@@ -22,3 +18,5 @@ NODE_COLORS = {
     "python": (36, 83, 121),
     "houdini": (177, 49, 2)
 }
+
+from .base_node_tp import BaseNodeTP

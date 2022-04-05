@@ -160,6 +160,7 @@ class MyTestCase(unittest.TestCase):
         # Initialize Action definition provider
         action_paths = ["../actions"]
         adp = core.ActionDefinitionProvider(action_paths)
+        adp.get_all()
         if len(adp.get_all()) == 0:
             print("No action definitions found")
             return False

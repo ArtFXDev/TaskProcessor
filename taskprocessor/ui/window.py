@@ -1,48 +1,63 @@
 import sys
+import os
+import signal
 
-from Qt import QtWidgets
-from NodeGraphQt.NodeGraphQt import NodeGraph, setup_context_menu
-import taskprocessor.ui as ui
-import taskprocessor.ui.nodes as nodes
+from Qt import QtCore, QtWidgets
+
+from NodeGraphQt import (NodeGraph,
+                         PropertiesBinWidget,
+                         Port,
+                         setup_context_menu)
+
+from taskprocessor.ui import UIManager
+
+
+def display_properties_bin(node):
+    if not properties_bin.isVisible():
+        properties_bin.show()
+
 
 if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
+    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
+    app = QtWidgets.QApplication([])
 
-    # create the node graph controller.
+    # create graph controller.
     graph = NodeGraph()
 
     # set up default menu and commands.
     setup_context_menu(graph)
 
-    # register backdrop node. (included in the NodeGraphQt module)
-    # graph.register_node(BackdropNode)
-
-    core_handler = ui.CoreHandler()
-    for n in core_handler.nodes:
-    # register example node into the node graph.
+    ui_manager = UIManager()
+    for n in ui_manager.get_node_classes():
+        # register example node into the node graph.
         graph.register_node(n)
 
-    # create nodes.
-    # node_a = graph.create_node('com.chantasticvfx.MyNode', name='Node A')
-    # node_b = graph.create_node('com.chantasticvfx.MyNode', name='Node B', color='#5b162f')
-    # backdrop = graph.create_node('nodeGraphQt.nodes.Backdrop', name='Backdrop')
-
-    # wrap "backdrop" node around "node_a" and "node_b"
-    # backdrop.wrap_nodes([node_a, node_b])
-
-    # connect "node_a" input to "node_b" output.
-    # node_a.set_input(0, node_b.output(0))
+    # widget used for the node graph.
+    graph_widget = graph.widget
+    graph_widget.resize(1100, 800)
+    graph_widget.show()
 
     # auto layout nodes.
     graph.auto_layout_nodes()
+    # fit node selection to the viewer.
+    graph.fit_to_selection()
 
-    graph.node_created.connect(lambda node: core_handler.init_node(node))
+    # create a node properties bin widget.
+    properties_bin = PropertiesBinWidget(node_graph=graph)
+    properties_bin.setWindowFlags(QtCore.Qt.Tool)
+
+    # wire function to "node_double_clicked" signal.
+    # graph.node_double_clicked.connect(display_properties_bin)
+
+    # graph.node_created.connect(lambda node: core_handler.init_node(node))
 
     # disconnect invalid types
-    graph.port_connected.connect(lambda ip, op: op.disconnect_from(ip) if(ip.data_type != op.data_type) else None)
+    graph.port_connected.connect(ui_manager.connect_nodes)
+    graph.port_disconnected.connect(ui_manager.disconnect_nodes)
+    graph.node_created.connect(ui_manager.create_node)
+    graph.nodes_deleted.connect(ui_manager.delete_nodes)
+    graph.property_changed.connect(ui_manager.change_node_input)
 
-    # show the node graph widget.
-    graph_widget = graph.widget
     graph_widget.show()
 
     app.exec_()

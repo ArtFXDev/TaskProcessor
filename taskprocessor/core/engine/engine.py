@@ -132,12 +132,8 @@ class Engine(object):
         is_success = is_success and is_tmp_deleted
 
         # TODO: Add better status text handling
-        exec_complete_status = """
-        Execution Status: COMPLETED
-        Execution Engine: {0}
-        Execution Success: {1}
-        Execution Code File: {2}
-        """.format(self.current_engine.name.upper(), is_success, exec_file.name)
+        exec_complete_status = "Execution Status: COMPLETED, Execution Engine: {0}, Execution Success: {1}, Execution Code File: {2}".format(
+            self.current_engine.name.upper(), is_success, exec_file.name)
 
         for c in self._complete_listeners:
             c(entity_path, True, exec_complete_status)
@@ -146,11 +142,8 @@ class Engine(object):
         temp_exec_file = path_utils.get_temp_file(exec_code, "tp_{0}_".format(self.current_engine.name), "py")
 
         # TODO: Add better status text handling
-        exec_start_status = """
-        Execution Status: START
-        Execution Engine: {0}
-        Execution Code File: {1}
-        """.format(self.current_engine.name.upper(), temp_exec_file.name)
+        exec_start_status = "Execution Status: START, Execution Engine: {0}, Execution Code File: {1}".format(
+            self.current_engine.name.upper(), temp_exec_file.name)
 
         for s in self._start_listeners:
             s(entity_path, exec_start_status)

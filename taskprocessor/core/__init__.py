@@ -20,3 +20,4 @@ from .node_attribute import NodeAttribute
 from .node_graph import NodeGraph
 from .processor import Processor
 from .task import Task
+from .core_manager import CoreManager

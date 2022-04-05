@@ -9,10 +9,10 @@ import taskprocessor.core as core
 class EntityManager(object):
 
     def __init__(self):
-        self.entities: [core.Entity] = [core.Entity("dummy")]
+        self.entities: list[core.Entity] = [core.Entity("dummy")]
         self.extensions: list[str] = ["*"]
 
-    def set_entities(self, paths: [str | Path]):
+    def set_entities(self, paths: list[str | Path]):
         files = []
         for p in paths:
             files.extend(path_utils.list_files(p, recursive=True, extensions=self.extensions))
@@ -21,7 +21,7 @@ class EntityManager(object):
         for f in files:
             self.entities.append(core.Entity(f))
 
-    def add_entity(self, path: [str | Path]):
+    def add_entity(self, path: str | Path):
 
         if len(self.entities) == 1 and self.entities[0].path == "dummy":
             self.entities.clear()
@@ -30,9 +30,10 @@ class EntityManager(object):
         for f in files:
             self.entities.append(core.Entity(f))
 
-    def remove_entity(self, path: [str | Path]):
+    def remove_entity(self, path: str | Path):
         path = Path(path)
-        rm_entity = next((e for e in self.entities if e.path == str(path.absolute())), None)
+        # TODO: Implement a helper function to compare paths
+        rm_entity = next((e for e in self.entities if e.path == path.resolve().as_posix()), None)
         self.entities.remove(rm_entity)
 
     def get_entity_extensions(self) -> set:
@@ -40,4 +41,3 @@ class EntityManager(object):
         for e in self.entities:
             extensions.add(e.get_extension())
         return extensions
-
