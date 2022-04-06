@@ -4,54 +4,31 @@ import signal
 
 from Qt import QtCore, QtWidgets
 
-from NodeGraphQt import (NodeGraph,
-                         PropertiesBinWidget,
-                         Port,
-                         setup_context_menu)
+from NodeGraphQt import NodeGraph, BaseNode
 
 from taskprocessor.ui import UIManager
 
 
-def display_properties_bin(node):
-    if not properties_bin.isVisible():
-        properties_bin.show()
-
-
 if __name__ == '__main__':
+    # handle SIGINT to make the app terminate on CTRL+C
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
     app = QtWidgets.QApplication([])
 
-    # create graph controller.
     graph = NodeGraph()
 
-    # set up default menu and commands.
-    setup_context_menu(graph)
-
     ui_manager = UIManager()
+    ui_manager.set_engine("maya")
     for n in ui_manager.get_node_classes():
-        # register example node into the node graph.
         graph.register_node(n)
 
-    # widget used for the node graph.
     graph_widget = graph.widget
     graph_widget.resize(1100, 800)
     graph_widget.show()
 
-    # auto layout nodes.
     graph.auto_layout_nodes()
-    # fit node selection to the viewer.
     graph.fit_to_selection()
 
-    # create a node properties bin widget.
-    properties_bin = PropertiesBinWidget(node_graph=graph)
-    properties_bin.setWindowFlags(QtCore.Qt.Tool)
-
-    # wire function to "node_double_clicked" signal.
-    # graph.node_double_clicked.connect(display_properties_bin)
-
-    # graph.node_created.connect(lambda node: core_handler.init_node(node))
-
-    # disconnect invalid types
     graph.port_connected.connect(ui_manager.connect_nodes)
     graph.port_disconnected.connect(ui_manager.disconnect_nodes)
     graph.node_created.connect(ui_manager.create_node)

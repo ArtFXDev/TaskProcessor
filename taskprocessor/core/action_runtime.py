@@ -103,12 +103,14 @@ class ActionRuntime(object):
         sub_var_names = []
         for i in self.definition.inputs:
             input_id = core.IdProvider.generate_io_id(True, self.definition.name, i.name)
-            sub_var_names.append(str(input_id))
             self.input_params[input_id] = i.value
+            if i.type is not core.ActionDataType.Empty:
+                sub_var_names.append(str(input_id))
         for o in self.definition.outputs:
             output_id = core.IdProvider.generate_io_id(False, self.definition.name, o.name)
-            sub_var_names.append(str(output_id))
             self.output_params[output_id] = o.value
+            if o.type is not core.ActionDataType.Empty:
+                sub_var_names.append(str(output_id))
 
         self.exec_code = self.exec_code.format(*sub_var_names)
 
@@ -144,60 +146,104 @@ class ActionRuntime(object):
     def get_input_id(self, input_index: int) -> core.ID:
         return list(self.input_params.keys())[input_index]
 
+    def get_input_index(self, input_id: core.ID) -> int:
+        return list(self.input_params.keys()).index(input_id)
+
+    def get_input_id_index(self, input_id: int | core.ID | str) -> tuple[int, core.ID]:
+        i_id: core.ID | None = None
+        i_index: int = -1
+        if type(input_id) is int:
+            i_index = input_id
+            i_id = self.get_input_id(i_index)
+        elif type(input_id) is core.ID:
+            i_id = input_id
+            i_index = self.get_input_index(i_id)
+        elif type(input_id) is str:
+            i_id = core.ID(input_id, transform=False)
+            i_index = self.get_input_index(i_id)
+
+        return i_index, i_id
+
     def get_output_id(self, output_index: int) -> core.ID:
         return list(self.output_params.keys())[output_index]
 
+    def get_output_index(self, output_id: core.ID) -> int:
+        return list(self.output_params.keys()).index(output_id)
+
+    def get_output_id_index(self, output_id: int | core.ID | str) -> tuple[int, core.ID]:
+        i_id: core.ID | None = None
+        i_index: int = -1
+        if type(output_id) is int:
+            i_index = output_id
+            i_id = self.get_output_id(i_index)
+        elif type(output_id) is core.ID:
+            i_id = output_id
+            i_index = self.get_output_index(i_id)
+        elif type(output_id) is str:
+            i_id = core.ID(output_id, transform=False)
+            i_index = self.get_output_index(i_id)
+
+        return i_index, i_id
+
     # Links the value of an input with its input_id
-    def set_input(self, input_index: int, value) -> bool:
-        if input_index >= len(self.definition.inputs):
+    def set_input(self, input_id: int | core.ID | str, value) -> bool:
+        (i_index, i_id) = self.get_input_id_index(input_id)
+        if i_index >= len(self.definition.inputs):
+            print(f"Input index out of range: {i_index}. Max: {len(self.definition.inputs)}")
             return False
         # if not ActionRuntime.__is_value_of_type(value, self.definition.inputs[input_index].type):
         #     return False
 
-        if self.definition.inputs[input_index].type == core.ActionDataType.Object:
+        if self.definition.inputs[i_index].type == core.ActionDataType.Object:
             # TODO: Add error logging
-            print("Setting input of type: {} is not allowed".format(self.definition.inputs[input_index].type.name))
+            print(f"Setting input of type: {self.definition.inputs[i_index].type.name} is not allowed")
             return False
 
-        input_id = self.get_input_id(input_index)
-        self.input_params[input_id] = value
+        self.input_params[i_id] = value
         return True
 
     # Resets the value of an input to its default value
-    def reset_input(self, input_index: int) -> bool:
-        if input_index >= len(self.definition.inputs):
+    def reset_input(self, input_id: int | core.ID | str) -> bool:
+        (i_index, i_id) = self.get_input_id_index(input_id)
+        if i_index >= len(self.definition.inputs):
+            print(f"Input index out of range: {i_index}. Max: {len(self.definition.inputs)}")
             return False
 
-        input_id = self.get_input_id(input_index)
-        self.input_params[input_id] = self.definition.inputs[input_index].value
+        self.input_params[i_id] = self.definition.inputs[i_index].value
         return True
 
     # Links the output_id of the other action to the input_id of this action.
     # This function is used to link output of one node as an input to this node.
-    def link_input(self, input_index: int, link_action: ActionRuntime, link_output_index: int) -> bool:
-        if input_index >= len(self.definition.inputs):
-            print("Input Index out of bounds")
+    def link_input(self,
+                   input_id: int | core.ID | str,
+                   output_action: ActionRuntime,
+                   output_id: int | core.ID | str) -> bool:
+
+        (i_index, i_id) = self.get_input_id_index(input_id)
+        (o_index, o_id) = output_action.get_output_id_index(output_id)
+
+        if i_index >= len(self.definition.inputs):
+            print(f"Input index out of range: {i_index}. Max: {len(self.definition.inputs)}")
             return False
-        if link_output_index >= len(link_action.definition.outputs):
-            print("Output Index out of bounds")
+        if o_index >= len(output_action.definition.outputs):
+            print(f"Output index out of range: {o_index}. Max: {len(output_action.definition.outputs)}")
             return False
-        if self.definition.inputs[input_index].type != link_action.definition.outputs[link_output_index].type:
+        if self.definition.inputs[i_index].type != output_action.definition.outputs[o_index].type:
             print("Input and output type does not match. Input Type: {} Output Type: {}"
-                  .format(self.definition.inputs[input_index].type,
-                          link_action.definition.outputs[link_output_index].type))
+                  .format(self.definition.inputs[i_index].type,
+                          output_action.definition.outputs[o_index].type))
             return False
 
-        input_id = self.get_input_id(input_index)
-        output_id = link_action.get_output_id(link_output_index)
-        self.input_params[input_id] = (output_id, link_action)
+        self.input_params[i_id] = (o_id, output_action)
         return True
 
     # Remove the input link
-    def unlink_input(self, input_index: int) -> bool:
-        if input_index >= len(self.definition.inputs):
+    def unlink_input(self, input_id: int | core.ID | str) -> bool:
+        (i_index, i_id) = self.get_input_id_index(input_id)
+        if i_index >= len(self.definition.inputs):
+            print(f"Input index out of range: {i_index}. Max: {len(self.definition.inputs)}")
             return False
-        self.reset_input(input_index)
-        return True
+        return self.reset_input(i_id)
 
     @staticmethod
     def __get_value_from_variable(entity: core.Entity, variable: core.ActionDataValueVariable):
@@ -213,8 +259,10 @@ class ActionRuntime(object):
         # Replace all inputs in code with linked output variable names
         tmp_code = str(self.exec_code)
         for (param_id, value) in self.input_params.items():
-            code_val = value
+            if value is None:
+                continue
 
+            code_val = value
             if type(value) == tuple:
                 code_val = value[0]
             elif type(value) == core.ActionDataValueVariable:

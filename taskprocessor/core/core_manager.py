@@ -62,22 +62,22 @@ class CoreManager(object):
     def delete_action(self, action_id: core.ID) -> bool:
         return self._action_manager.delete_action(action_id)
 
-    def set_input(self, action_id: core.ID, index: int, value: Any) -> bool:
-        return self._action_manager.set_input(action_id, index, value)
+    def set_input(self, action_id: core.ID, input_id: int | core.ID | str, value: Any) -> bool:
+        return self._action_manager.set_input(action_id, input_id, value)
 
-    def reset_input(self, action_id: core.ID, index: int) -> bool:
-        return self._action_manager.reset_input(action_id, index)
+    def reset_input(self, action_id: core.ID, input_id: int | core.ID | str) -> bool:
+        return self._action_manager.reset_input(action_id, input_id)
 
     def link_input(self,
-                   action_id: core.ID,
-                   input_index: int,
-                   incoming_action_id: core.ID,
-                   incoming_output_id: int) -> bool:
-        return self._action_manager.link_input(action_id, input_index, incoming_action_id, incoming_output_id)
+                   input_action_id: core.ID,
+                   input_id: int | core.ID | str,
+                   output_action_id: core.ID,
+                   output_id: int | core.ID | str) -> bool:
+        return self._action_manager.link_input(input_action_id, input_id, output_action_id, output_id)
 
     def unlink_input(self,
-                     action_id: core.ID, input_index: int) -> bool:
-        return self._action_manager.unlink_input(action_id, input_index)
+                     action_id: core.ID, input_id: int | core.ID | str) -> bool:
+        return self._action_manager.unlink_input(action_id, input_id)
 
     def set_on_process_listeners(self,
                                  start_callback: Callable[[str], None] | None = None,

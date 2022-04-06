@@ -12,10 +12,6 @@ class UIManager(object):
     def __init__(self):
         self._node_action_data: dict[str, ID] = {}
         self._core = CoreManager()
-        self._initialize()
-
-    def _initialize(self):
-        pass
 
     def set_engine(self, engine_name: str) -> bool:
         return self._core.set_engine(engine_name)
@@ -42,7 +38,6 @@ class UIManager(object):
 
     def create_node(self, node: BaseNodeTP) -> bool:
         if not issubclass(type(node), BaseNodeTP) or node.is_initialized:
-            print("Node not of type TaskProcessor")
             return False
 
         action = self._core.create_action(node.ACTION_NAME)
@@ -64,18 +59,18 @@ class UIManager(object):
 
     def connect_nodes(self, input_port: Port, output_port: Port) -> bool:
         in_node = input_port.node()
-        in_index = in_node.input_ports().index(input_port)
         out_node = output_port.node()
-        out_index = out_node.output_ports().index(output_port)
 
         if not issubclass(type(input_port.node()), BaseNodeTP) and not issubclass(type(output_port.node()), BaseNodeTP):
             return False
 
-        is_linked = self._core.link_input(in_node.action.id, in_index,
-                                          out_node.action.id, out_index)
+        is_linked = self._core.link_input(in_node.action.id, input_port.name(),
+                                          out_node.action.id, output_port.name())
 
         if is_linked:
-            in_node.get_widget(str(in_node.action.get_input_id(in_index))).widget().setDisabled(True)
+            input_widget = in_node.get_widget(input_port.name())
+            if input_widget is not None:
+                input_widget.widget().setDisabled(True)
         else:
             input_port.disconnect_from(output_port)
 
@@ -83,20 +78,22 @@ class UIManager(object):
 
     def disconnect_nodes(self, input_port: Port, output_port: Port) -> bool:
         in_node = input_port.node()
-        in_index = in_node.input_ports().index(input_port)
 
-        is_unlinked = self._core.unlink_input(in_node.action.id, in_index)
+        is_unlinked = self._core.unlink_input(in_node.action.id, input_port.name())
 
         if is_unlinked:
-            in_node.get_widget(str(in_node.action.get_input_id(in_index))).widget().setDisabled(False)
+            input_widget = in_node.get_widget(input_port.name())
+            if input_widget is not None:
+                input_widget.widget().setDisabled(False)
 
         return is_unlinked
 
     def change_node_input(self, node: BaseNodeTP, input_name: str, input_value: object) -> bool:
         if not issubclass(type(node), BaseNodeTP):
-            print("Node not of type TaskProcessor")
             return False
-        print(f"Node: {node.name()} Widget: {input_name} Value: {input_value}")
+
+        widget = node.get_widget(input_name)
+        if widget is None:
+            return False
+        self._core.set_input(node.action.id, input_name, input_value)
         return True
-
-

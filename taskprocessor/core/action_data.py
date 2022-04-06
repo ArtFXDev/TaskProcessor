@@ -28,7 +28,7 @@ class ActionDataValueVariable(Enum):
 class ActionData(object):
 
     def __init__(self,
-                 label: str = "Action Dummy Data",
+                 label: str = "Dummy Data",
                  data_type: ActionDataType = ActionDataType.Empty,
                  value: Any = None):
         self.label: str = label

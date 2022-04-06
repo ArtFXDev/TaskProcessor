@@ -33,35 +33,35 @@ class ActionManager(object):
         del action
         return True
 
-    def set_input(self, action_id: core.ID, input_index: int, value) -> bool:
+    def set_input(self, action_id: core.ID, input_id: int | core.ID | str, value) -> bool:
         action = self.get_action_by_id(action_id)
         if action is None:
             return False
-        return action.set_input(input_index, value)
+        return action.set_input(input_id, value)
 
-    def reset_input(self, action_id: core.ID, input_index: int) -> bool:
+    def reset_input(self, action_id: core.ID, input_id: int | core.ID | str) -> bool:
         action = self.get_action_by_id(action_id)
         if action is None:
             return False
-        return action.reset_input(input_index)
+        return action.reset_input(input_id)
 
-    def link_input(self, current_action_id: core.ID,
-                   current_input_index: int,
-                   source_action_id: core.ID,
-                   source_output_index: int) -> bool:
-        curr_action = self.get_action_by_id(current_action_id)
-        if curr_action is None:
+    def link_input(self, input_action_id: core.ID,
+                   input_id: int | core.ID | str,
+                   output_action_id: core.ID,
+                   output_id: int | core.ID | str) -> bool:
+        input_action = self.get_action_by_id(input_action_id)
+        if input_action is None:
             return False
-        src_action = self.get_action_by_id(source_action_id)
+        output_action = self.get_action_by_id(output_action_id)
 
-        return curr_action.link_input(current_input_index, src_action, source_output_index)
+        return input_action.link_input(input_id, output_action, output_id)
 
-    def unlink_input(self, action_id: core.ID, input_index: int) -> bool:
+    def unlink_input(self, action_id: core.ID, input_id: int | core.ID | str) -> bool:
         action = self.get_action_by_id(action_id)
         if action is None:
             return False
 
-        return action.unlink_input(input_index)
+        return action.unlink_input(input_id)
 
     def get_action_by_id(self, action_id: core.ID) -> core.ActionRuntime:
         return next((a for a in self.actions if action_id == a.id), None)

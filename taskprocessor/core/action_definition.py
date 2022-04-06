@@ -56,13 +56,13 @@ class ActionDefinition(object):
 
         # For each input as a dictionary, convert it to a string and then convert it to a ActionData object
         inputs_arr = json_dict['inputs']
-        inputs = []
+        inputs = [core.ActionData()]
         for i in inputs_arr:
             inputs.append(core.ActionData.from_json(json_utils.dict_to_json(i)))
 
         # For each output as a dictionary, convert it to a string and then convert it to a ActionData object
         outputs_arr = json_dict['outputs']
-        outputs = []
+        outputs = [core.ActionData()]
         for o in outputs_arr:
             outputs.append(core.ActionData.from_json(json_utils.dict_to_json(o)))
 
