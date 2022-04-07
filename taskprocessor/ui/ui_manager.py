@@ -99,6 +99,7 @@ class UIManager(object):
         widget = node.get_widget(input_name)
         if widget is None:
             return False
+
         self._core.set_input(node.action.id, input_name, input_value)
         return True
 

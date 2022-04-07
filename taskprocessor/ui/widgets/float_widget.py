@@ -1,6 +1,7 @@
 from Qt import QtGui
 from NodeGraphQt.widgets.node_widgets import NodeLineEdit
 
+
 class FloatWidget(NodeLineEdit):
 
     def __init__(self, parent=None, name='', label='', value=0.0):

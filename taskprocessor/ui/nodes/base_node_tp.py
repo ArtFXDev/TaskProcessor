@@ -3,7 +3,7 @@ from __future__ import annotations
 from NodeGraphQt import BaseNode
 from taskprocessor.ui import (ActionDataType, ActionDefinition, ActionRuntime)
 from taskprocessor.ui.nodes import (NODE_COLORS, NODE_IO_TYPE_COLORS)
-from taskprocessor.ui.widgets import IntWidget, FloatWidget
+from taskprocessor.ui.widgets import IntWidget, FloatWidget, PathWidget
 
 
 def node_prototype_constructor(self):
@@ -55,8 +55,11 @@ class BaseNodeTP(BaseNode):
         # Add widgets. (This is done in the end to avoid layout alignment issues)
         for (index, i) in enumerate(action.definition.inputs):
             name = str(action.get_input_id(index))
-            if i.type == ActionDataType.String or i.type == ActionDataType.Path:
+            if i.type == ActionDataType.String:
                 self.add_text_input(name, i.label, i.value, tab="widgets")
+            elif i.type == ActionDataType.Path:
+                path_widget = PathWidget(parent=self.view, name=name, label=i.label, text=i.value)
+                self.add_custom_widget(path_widget, tab="widgets")
             elif i.type == ActionDataType.Integer:
                 int_widget = IntWidget(parent=self.view, name=name, label=i.label, value=i.value)
                 self.add_custom_widget(int_widget, tab="widgets")
