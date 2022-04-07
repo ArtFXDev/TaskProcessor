@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Callable
 
 from pathlib import Path
 
@@ -97,3 +98,20 @@ class UIManager(object):
             return False
         self._core.set_input(node.action.id, input_name, input_value)
         return True
+
+    def set_on_process_listeners(self,
+                                 start_callback: Callable[[str], None] | None = None,
+                                 progress_callback: Callable[[str, str, float, float, str], None] | None = None,
+                                 error_callback: Callable[[str], None] | None = None,
+                                 completed_callback: Callable[[bool, str], None] | None = None):
+        self._core.set_on_process_listeners(start_callback, progress_callback, error_callback, completed_callback)
+
+    def remove_on_process_listeners(self,
+                                    start_callback: Callable[[str], None] | None = None,
+                                    progress_callback: Callable[[str, str, float, float, str], None] | None = None,
+                                    error_callback: Callable[[str], None] | None = None,
+                                    completed_callback: Callable[[bool, str], None] | None = None):
+        self._core.remove_on_process_listeners(start_callback, progress_callback, error_callback, completed_callback)
+
+    def run(self):
+        self._core.run()
