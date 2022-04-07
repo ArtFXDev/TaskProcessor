@@ -86,6 +86,9 @@ class UIManager(object):
             input_widget = in_node.get_widget(input_port.name())
             if input_widget is not None:
                 input_widget.widget().setDisabled(False)
+                input_value = self._core.get_input_value(in_node.action.id, input_port.name())
+                if input_value is not None:
+                    input_widget.set_value(str(input_value))
 
         return is_unlinked
 

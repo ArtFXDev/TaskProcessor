@@ -3,13 +3,12 @@ from typing import Any, Callable
 
 from enum import Enum
 from pathlib import Path
+from taskprocessor import config_manager
 import taskprocessor.core as core
 import taskprocessor.core.engine as engine
 
 
 class CoreManager(object):
-    _action_def_paths = ["../../actions"]
-    _engine_config_path = "../../resources/configs/config_engine.json"
 
     class ActionFilterType(Enum):
         All = 0,
@@ -17,8 +16,8 @@ class CoreManager(object):
         EngineName = 2
 
     def __init__(self):
-        self._engine = engine.Engine(CoreManager._engine_config_path)
-        self._action_def_provider = core.ActionDefinitionProvider(CoreManager._action_def_paths)
+        self._engine = engine.Engine(config_manager.get_engine_config_path())
+        self._action_def_provider = core.ActionDefinitionProvider([config_manager.get_builtin_actions_dir()])
         self._entity_manager = core.EntityManager()
         self._action_manager = core.ActionManager(self._action_def_provider)
         self._processor = core.Processor(self._engine)
@@ -65,6 +64,9 @@ class CoreManager(object):
     def set_input(self, action_id: core.ID, input_id: int | core.ID | str, value: Any) -> bool:
         return self._action_manager.set_input(action_id, input_id, value)
 
+    def get_input_value(self, action_id: core.ID, input_id: int | core.ID | str) -> str | int | float | bool | None:
+        return self._action_manager.get_input_value(action_id, input_id)
+
     def reset_input(self, action_id: core.ID, input_id: int | core.ID | str) -> bool:
         return self._action_manager.reset_input(action_id, input_id)
 
@@ -78,6 +80,10 @@ class CoreManager(object):
     def unlink_input(self,
                      action_id: core.ID, input_id: int | core.ID | str) -> bool:
         return self._action_manager.unlink_input(action_id, input_id)
+
+    def get_all_actions(self) -> list[core.ActionRuntime]:
+        node_graph = core.NodeGraph(self._action_manager.actions)
+        return node_graph.get_actions()
 
     def set_on_process_listeners(self,
                                  start_callback: Callable[[str], None] | None = None,
@@ -108,6 +114,5 @@ class CoreManager(object):
             self._processor.remove_on_completed_listener(completed_callback)
 
     def run(self):
-        node_graph = core.NodeGraph(self._action_manager.actions)
-        self._processor.create_job(self._entity_manager.entities, node_graph.get_actions())
+        self._processor.create_job(self._entity_manager.entities, self.get_all_actions())
         self._processor.start()

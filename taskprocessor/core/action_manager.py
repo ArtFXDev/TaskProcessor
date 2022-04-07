@@ -39,6 +39,12 @@ class ActionManager(object):
             return False
         return action.set_input(input_id, value)
 
+    def get_input_value(self, action_id: core.ID, input_id: int | core.ID | str) -> str | int | float | bool | None:
+        action = self.get_action_by_id(action_id)
+        if action is None:
+            return None
+        return action.get_input_value(input_id)
+
     def reset_input(self, action_id: core.ID, input_id: int | core.ID | str) -> bool:
         action = self.get_action_by_id(action_id)
         if action is None:

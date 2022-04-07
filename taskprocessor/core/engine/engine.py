@@ -67,29 +67,34 @@ class Engine(object):
     def remove_complete_listener(self, callback: Callable[[str, bool, str], None]):
         self._complete_listeners.remove(callback)
 
-    def __enqueue_output(self, out, queue):
+    @staticmethod
+    def _enqueue_output(out, queue):
         for line in iter(out.readline, b''):
             queue.put(line)
         out.close()
 
-    def __execute(self, entity_path: str, exec_file: io.TextIOWrapper):
+    @staticmethod
+    def _execute(entity_path: str,
+                 engine_name: str,
+                 engine_path: str,
+                 exec_file: io.TextIOWrapper,
+                 progress_listeners: list[Callable[[str, str, float, str, bool], None]],
+                 complete_listeners: list[Callable[[str, bool, str], None]]):
         is_success = True
 
         # Sanitize executable file path
         exec_path = path_utils.get_absolute_path(exec_file.name)
 
-        args = [self.current_engine.exec_path, exec_path]
+        args = [engine_path, exec_path]
 
         curr_progress = 0.0
         curr_action = ""
 
         subp = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout_queue = Queue()
-        stdout_thread = Thread(target=self.__enqueue_output, args=(subp.stdout, stdout_queue))
-        # stdout_thread.daemon = True
+        stdout_thread = Thread(target=Engine._enqueue_output, args=(subp.stdout, stdout_queue))
         stderr_queue = Queue()
-        stderr_thread = Thread(target=self.__enqueue_output, args=(subp.stderr, stderr_queue))
-        # stderr_thread.daemon = True
+        stderr_thread = Thread(target=Engine._enqueue_output, args=(subp.stderr, stderr_queue))
 
         stdout_thread.start()
         stderr_thread.start()
@@ -114,7 +119,7 @@ class Engine(object):
                 if action_id is not curr_action or progress is not curr_progress:
                     curr_action = action_id
                     curr_progress = progress
-                    for p in self._progress_listeners:
+                    for p in progress_listeners:
                         p(entity_path, curr_action, curr_progress, data, False)
 
             try:
@@ -122,7 +127,7 @@ class Engine(object):
             except Empty:
                 pass
             else:
-                for p in self._progress_listeners:
+                for p in progress_listeners:
                     p(entity_path, curr_action, curr_progress, stderr_line.decode("utf-8"), True)
 
         stdout_thread.join()
@@ -133,9 +138,9 @@ class Engine(object):
 
         # TODO: Add better status text handling
         exec_complete_status = "Execution Status: COMPLETED, Execution Engine: {0}, Execution Success: {1}, Execution Code File: {2}".format(
-            self.current_engine.name.upper(), is_success, exec_file.name)
+            engine_name.upper(), is_success, exec_file.name)
 
-        for c in self._complete_listeners:
+        for c in complete_listeners:
             c(entity_path, True, exec_complete_status)
 
     def execute(self, entity_path: str, exec_code: str):
@@ -148,4 +153,10 @@ class Engine(object):
         for s in self._start_listeners:
             s(entity_path, exec_start_status)
 
-        self.__execute(entity_path, temp_exec_file)
+        thread = Thread(target=Engine._execute, args=(entity_path,
+                                                      self.current_engine.name,
+                                                      self.current_engine.exec_path,
+                                                      temp_exec_file,
+                                                      self._progress_listeners,
+                                                      self._complete_listeners))
+        thread.start()

@@ -186,7 +186,7 @@ class ActionRuntime(object):
         return i_index, i_id
 
     # Links the value of an input with its input_id
-    def set_input(self, input_id: int | core.ID | str, value) -> bool:
+    def set_input(self, input_id: int | core.ID | str, value: str | int | float | bool) -> bool:
         (i_index, i_id) = self.get_input_id_index(input_id)
         if i_index >= len(self.definition.inputs):
             print(f"Input index out of range: {i_index}. Max: {len(self.definition.inputs)}")
@@ -200,7 +200,21 @@ class ActionRuntime(object):
             return False
 
         self.input_params[i_id] = value
+        self.definition.inputs[i_index].value = value
         return True
+
+    def get_input_value(self, input_id: int | core.ID | str) -> str | int | float | bool | None:
+        (i_index, i_id) = self.get_input_id_index(input_id)
+        if i_index >= len(self.definition.inputs):
+            print(f"Input index out of range: {i_index}. Max: {len(self.definition.inputs)}")
+            return None
+
+        if type(self.input_params[i_id]) is core.ActionDataValueVariable:
+            return None
+        if type(self.input_params[i_id]) is tuple:
+            return None
+
+        return self.input_params[i_id]
 
     # Resets the value of an input to its default value
     def reset_input(self, input_id: int | core.ID | str) -> bool:
