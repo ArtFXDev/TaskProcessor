@@ -28,7 +28,7 @@ class ActionDataValueVariable(Enum):
 class ActionData(object):
 
     def __init__(self,
-                 label: str = "Action Dummy Data",
+                 label: str = "Dummy Data",
                  data_type: ActionDataType = ActionDataType.Empty,
                  value: Any = None):
         self.label: str = label
@@ -49,7 +49,7 @@ class ActionData(object):
 
     # Get a ActionData object from json string
     @staticmethod
-    def from_json(json_data) -> ActionData:
+    def from_json(json_data: str) -> ActionData:
         # TODO: Throw exceptions on fail
         json_dict = json_utils.json_to_dict(json_data)
         action_data = ActionData(json_dict['label'],

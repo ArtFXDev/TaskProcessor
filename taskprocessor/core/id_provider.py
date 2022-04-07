@@ -4,10 +4,16 @@ import taskprocessor.utils.path_utils as path_utils
 
 
 class ID(object):
-    def __init__(self, name: str):
-        self.name = path_utils.get_name_from_label(name)
+    def __init__(self, name: str, transform: bool = True):
+        self.name = path_utils.get_name_from_label(name) if transform else name
 
-    def __str__(self):
+    def __hash__(self):
+        return hash(self.name)
+
+    def __eq__(self, other: ID) -> bool:
+        return self.name == other.name
+
+    def __str__(self) -> str:
         return self.name
 
 
