@@ -5,4 +5,5 @@ from taskprocessor.core import (ActionDataType,
                                 ID,
                                 CoreManager)
 
-from .ui_manager import UIManager
+from taskprocessor.ui.ui_manager import UIManager
+ui_manager = UIManager()
