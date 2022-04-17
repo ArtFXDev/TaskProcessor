@@ -53,19 +53,22 @@ class Engine(object):
         self._progress_listeners.append(callback)
 
     def remove_progress_listener(self, callback: Callable[[str, str, float, str, bool], None]):
-        self._progress_listeners.remove(callback)
+        if self._progress_listeners.count(callback) > 0:
+            self._progress_listeners.remove(callback)
 
     def add_start_listener(self, callback: Callable[[str, str], None]):
         self._start_listeners.append(callback)
 
     def remove_start_listener(self, callback: Callable[[str, str], None]):
-        self._start_listeners.remove(callback)
+        if self._start_listeners.count(callback) > 0:
+            self._start_listeners.remove(callback)
 
     def add_complete_listener(self, callback: Callable[[str, bool, str], None]):
         self._complete_listeners.append(callback)
 
     def remove_complete_listener(self, callback: Callable[[str, bool, str], None]):
-        self._complete_listeners.remove(callback)
+        if self._complete_listeners.count(callback) > 0:
+            self._complete_listeners.remove(callback)
 
     @staticmethod
     def _enqueue_output(out, queue):
@@ -159,4 +162,5 @@ class Engine(object):
                                                       temp_exec_file,
                                                       self._progress_listeners,
                                                       self._complete_listeners))
+        thread.daemon = True
         thread.start()

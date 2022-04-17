@@ -78,10 +78,16 @@ class PathWidget(NodeBaseWidget):
 
     def on_file_browser_clicked(self):
         global current_dir
-        file_out = QtWidgets.QFileDialog.getOpenFileName(caption=self.get_label(),
-                                                         dir=current_dir,
-                                                         filter=self.ext_filter)
-        file = file_out[0] or None
-        if file is not None:
-            current_dir = file
-            self.set_value(file)
+
+        file_dialog = QtWidgets.QFileDialog(self.get_custom_widget(),
+                                            caption=self.get_label(),
+                                            directory=current_dir,
+                                            filter=self.ext_filter)
+        file_dialog.setFileMode(QtWidgets.QFileDialog.AnyFile)
+        file_dialog.setViewMode(QtWidgets.QFileDialog.Detail)
+
+        if file_dialog.exec_():
+            file = file_dialog.selectedFiles()[0] or None
+            if file is not None:
+                current_dir = file
+                self.set_value(file)

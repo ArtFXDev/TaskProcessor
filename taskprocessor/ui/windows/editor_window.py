@@ -47,15 +47,13 @@ class EditorWindow(QtWidgets.QMainWindow):
     def update_entities(self):
         indices = self.fileViewer.selectedIndexes()
         files = [i.model().filePath(i) for i in indices]
-        for f in files:
-            print(f"Adding Entity: {f}")
-            ui_manager.add_entity(f)
+        ui_manager.set_entities(files)
 
     def on_process_started(self, status):
         print(f"Execution Started: {status}")
 
     def on_process_progressed(self, task, action, total, action_progress, status):
-        # print(f"Execution Progress: {task} | {action} | {total} | {action_progress}")
+        print(f"Execution Progress: {task} | {action} | {total} | {action_progress}")
         self.progressBar.setValue(int(total * 100.0))
 
     def on_process_error(self, error):
@@ -87,7 +85,6 @@ class EditorWindow(QtWidgets.QMainWindow):
         graph_widget = self.graph.widget
         self.graphHolder.addWidget(graph_widget)
         graph_widget.show()
-        print(graph_widget)
 
     @staticmethod
     def display():

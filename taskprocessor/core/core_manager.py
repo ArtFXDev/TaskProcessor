@@ -9,7 +9,6 @@ import taskprocessor.core.engine as engine
 
 
 class CoreManager(object):
-
     class ActionFilterType(Enum):
         All = 0,
         Name = 1,
@@ -34,6 +33,9 @@ class CoreManager(object):
 
     def get_current_engine(self) -> str:
         return self._engine.current_engine.name
+
+    def set_entities(self, entities: list[str | Path]):
+        self._entity_manager.set_entities(entities)
 
     def add_entity(self, entity: str | Path):
         self._entity_manager.add_entity(entity)
