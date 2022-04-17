@@ -143,12 +143,15 @@
           <property name="selectionMode">
            <enum>QAbstractItemView::MultiSelection</enum>
           </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectItems</enum>
+          </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="entitiesButton">
           <property name="text">
-           <string>Add Entities</string>
+           <string>Update Entities</string>
           </property>
          </widget>
         </item>
@@ -235,7 +238,7 @@
      <x>0</x>
      <y>0</y>
      <width>1116</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
