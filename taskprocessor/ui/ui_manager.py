@@ -20,6 +20,9 @@ class UIManager(object):
     def get_current_engine(self):
         return self._core.get_current_engine()
 
+    def set_entities(self, entities: list[str | Path]):
+        self._core.set_entities(entities)
+
     def add_entity(self, entity: str | Path):
         self._core.add_entity(entity)
 

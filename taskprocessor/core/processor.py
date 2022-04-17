@@ -20,25 +20,29 @@ class Processor(object):
         self._start_listeners.append(callback)
 
     def remove_on_start_listener(self, callback: Callable[[str], None]):
-        self._start_listeners.remove(callback)
+        if self._start_listeners.count(callback) > 0:
+            self._start_listeners.remove(callback)
 
     def add_on_progress_listener(self, callback: Callable[[str, str, float, float, str], None]):
         self._progress_listeners.append(callback)
 
     def remove_on_progress_listener(self, callback: Callable[[str, str, float, float, str], None]):
-        self._progress_listeners.remove(callback)
+        if self._progress_listeners.count(callback) > 0:
+            self._progress_listeners.remove(callback)
 
     def add_on_error_listener(self, callback: Callable[[str], None]):
         self._error_listeners.append(callback)
 
     def remove_on_error_listener(self, callback: Callable[[str], None]):
-        self._error_listeners.remove(callback)
+        if self._error_listeners.count(callback) > 0:
+            self._error_listeners.remove(callback)
 
     def add_on_completed_listener(self, callback: Callable[[bool, str], None]):
         self._complete_listeners.append(callback)
 
     def remove_on_completed_listener(self, callback: Callable[[bool, str], None]):
-        self._complete_listeners.remove(callback)
+        if self._complete_listeners.count(callback) > 0:
+            self._complete_listeners.remove(callback)
 
     def on_job_started(self, job: core.Job, status: str):
         for listener in self._start_listeners:
