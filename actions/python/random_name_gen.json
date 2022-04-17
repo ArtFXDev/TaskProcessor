@@ -1,0 +1,23 @@
+{
+  "label": "Random Name Generator",
+  "inputs": [
+    {
+      "label": "Length",
+      "type": "Integer",
+      "value": 8
+    }
+  ],
+  "outputs": [
+    {
+      "label": "Name",
+      "type": "String",
+      "value": "abc"
+    }
+  ],
+  "supported_engines": [
+    "python",
+    "maya",
+    "houdini"
+  ],
+  "exec_path": "random_name_gen.py"
+}

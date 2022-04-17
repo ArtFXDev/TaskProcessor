@@ -1,0 +1,22 @@
+{
+  "label": "Write File",
+  "inputs": [
+    {
+      "label": "Filepath",
+      "type": "Path",
+      "value": ""
+    },
+    {
+      "label": "Input text",
+      "type": "String",
+      "value": ""
+    }
+  ],
+  "outputs": [],
+  "supported_engines": [
+    "python",
+    "maya",
+    "houdini"
+  ],
+  "exec_path": "write_file.py"
+}

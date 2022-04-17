@@ -1,0 +1,31 @@
+{
+  "type": "config",
+  "name": "engine",
+  "version": "0.1.0",
+  "data": [
+    {
+      "name": "python",
+      "extensions": [
+        "py"
+      ],
+      "exec_path": "C:/Users/suraj/AppData/Local/Programs/Python/Python37/python.exe"
+    },
+    {
+      "name": "maya",
+      "extensions": [
+        "ma",
+        "mb"
+      ],
+      "exec_path": "C:/Program Files/Autodesk/Maya2022/bin/mayapy.exe"
+    },
+    {
+      "name": "houdini",
+      "extensions": [
+        "hip",
+        "hiplc",
+        "hipnc"
+      ],
+      "exec_path": "C:/Program Files/Side Effects Software/Houdini 19.0.498/bin/hython.exe"
+    }
+  ]
+}

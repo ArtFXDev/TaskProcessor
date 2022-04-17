@@ -1,0 +1,25 @@
+{
+  "label": "Export Alembic",
+  "inputs": [
+    {
+      "label": "Frame Range",
+      "type": "String",
+      "value": "1 1"
+    },
+    {
+      "label": "Root Node",
+      "type": "String",
+      "value": ""
+    },
+    {
+      "label": "Filepath",
+      "type": "String",
+      "value": ""
+    }
+  ],
+  "outputs": [],
+  "supported_engines": [
+    "maya"
+  ],
+  "exec_path": "export_abc.py"
+}
